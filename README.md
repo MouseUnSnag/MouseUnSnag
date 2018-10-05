@@ -37,7 +37,7 @@ The program endeavors to fix two separate problems related to multiple monitors,
 **MouseUnSnag** uses the low-level Win32 WH_MOUSE_LL callback to monitor the user's intended movement of the mouse. It also monitors the current position of the cursor on the screen. When **MouseUnSnag** detects that the mouse has tried to move beyond the edge/corner of the screen, but the cursor was not able to move, then it knows that the cursor is "stuck", and will attempt to sensibly move the cursor to an adjacent monitor, if one exists.
 
 ## Future Directions
-Although I believe this is quite a *useful* program, it obviously not very "user friendly". It just runs at the command line (you must "minimize" the CMD console window, to get it out of the way), and prints out some debugging information on the console as you move the mouse around. If more than three or four people actually wind up using the program, and there is interest, it may be worth investing some effort towards some improvements, such as:
+Although I believe this is quite a *useful* program, it is obviously not very "user friendly". It just runs at the command line (you must "minimize" the CMD console window, to get it out of the way), and prints out some debugging information on the console as you move the mouse around. If more than three or four people actually wind up using the program, and there is interest, it may be worth investing some effort towards some improvements, such as:
 * Getting rid of the "command line" interface, and instead have an associated System Tray icon.
 * Allow enabling and disabling of features, in case you don't like the "wrap-around", for instance.
 * Allow more complex options for removing cursor "stickiness" only on particular edges or corners.
