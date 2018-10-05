@@ -17,7 +17,7 @@ Then you can run the program by just typing the name of the executable, **MouseU
 You can also just download the "released" executable (currently less than 15Kbytes!!) provided here in the GitHub project.
 
 ## What does it do?
-The program endeavors to fix two separate problems related to multiple monitors, which were brought up in a couple of **superuser.com** posts. The respective authors also provided nice graphical representations of the two separate problems.
+The program endeavors to fix two separate problems related to multiple monitors, which were brought up in a couple of **superuser.com** posts. The respective authors also provided nice graphical representations of the problems.
 
 1. Mouse gets stuck on corners. This is an intentional feature of Windows, to keep the mouse from "sliding off" the corner of the monitor when you are trying to get to the task bar at the bottom of the screen. But if you find it annoying rather than helpful, **MouseUnSnag** will fix it for you.
 
@@ -30,6 +30,8 @@ The program endeavors to fix two separate problems related to multiple monitors,
    [How to make the mouse wrap from corners when moving between monitors? - superuser.com](https://superuser.com/questions/865469/how-to-make-the-mouse-wrap-from-corners-when-moving-between-monitors)
    
    <img src=https://i.stack.imgur.com/5Rlji.png width="400"/>
+
+3. **MouseUnSnag** also wraps the cursor around from the right edge of the rightmost monitor, to the left edge of the leftmost monitor, and vice versa. (I don't have a fancy graphic for that one!)
 
 ## How does it do it?
 **MouseUnSnag** uses the low-level Win32 WH_MOUSE_LL callback to monitor the user's intended movement of the mouse. It also monitors the current position of the cursor on the screen. When **MouseUnSnag** detects that the mouse has tried to move beyond the edge/corner of the screen, but the cursor was not able to move, then it knows that the cursor is "stuck", and will attempt to sensibly move the cursor to an adjacent monitor, if one exists.
