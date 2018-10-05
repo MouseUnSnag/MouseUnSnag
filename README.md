@@ -4,7 +4,9 @@ On a Windows system with multiple monitors, allow the mouse to move freely and n
 ## Getting Started
 This is a relatively simple, one-file, command-line C# program that solves the problem of the mouse getting "stuck" on corners and edges when moving between multiple monitors on a Windows system.
 
-The program can be compiled simply at the command line. It requires at least version 7 of the C# compiler. You can get the latest version of the command-line C# compiler (no need to install the whole Visual Studio!!) using NuGet ([Latest NuGet.exe](https://dist.nuget.org/win-x86-commandline/latest/nuget.exe)), from a Windows CMD command line:
+You can download and run this project's "released" executable (currently less than 15Kbytes!!)  [RELEASE LINK](https://github.com/dale-roberts/MouseUnSnag/releases), or click on "release" in the GitHub GUI above.
+
+If you like, you may instead compile the program at the command line. It requires at least version 7 of the C# compiler. You can get the latest version of the command-line C# compiler (no need to install the whole Visual Studio!!) using NuGet ([Latest NuGet.exe](https://dist.nuget.org/win-x86-commandline/latest/nuget.exe)), from a Windows CMD command line:
 ```
 nuget install Microsoft.Net.Compilers
 ```
@@ -13,8 +15,6 @@ This will install the C# compiler in a subdirectory under your current folder. A
 Microsoft.Net.Compilers.2.6.1\tools\csc.exe MouseUnSnag.cs
 ```
 Then you can run the program by just typing the name of the executable, **MouseUnSnag**. That's it!!
-
-You can also just download the "released" executable (currently less than 15Kbytes!!) provided here in the GitHub project.
 
 ## What does it do?
 The program endeavors to fix two separate problems related to multiple monitors, which were brought up in a couple of **superuser.com** posts. The respective authors also provided nice graphical representations of the problems.
