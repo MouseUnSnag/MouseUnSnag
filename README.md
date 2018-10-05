@@ -4,7 +4,7 @@ On a Windows system with multiple monitors, allow the mouse to move freely and n
 ## Getting Started
 This is a relatively simple, one-file, command-line C# program that solves the problem of the mouse getting "stuck" on corners and edges when moving between multiple monitors on a Windows system.
 
-The program can be compiled simply at the command line. It requires at least version 7 of the C# compiler. You can get the latest version of the command-line C# compiler (no need to install the whole Visual Studio!!) using NuGet, from a Windows CMD command line:
+The program can be compiled simply at the command line. It requires at least version 7 of the C# compiler. You can get the latest version of the command-line C# compiler (no need to install the whole Visual Studio!!) using NuGet ([Latest NuGet.exe](https://dist.nuget.org/win-x86-commandline/latest/nuget.exe)), from a Windows CMD command line:
 ```
 nuget install Microsoft.Net.Compilers
 ```
