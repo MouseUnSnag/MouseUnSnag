@@ -12,16 +12,10 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 using Microsoft.Win32;
+using MouseUnSnag.Properties;
 
-using static StaticStuff;
-using static SnagScreen;
-
-public static class StaticStuff
+public static class NativeMethods
 {
-    // ============================================================================================
-    // Win32 interfaces.
-    //
-
     public const int WH_MOUSE_LL = 14; // Win32 low-level mouse event hook ID.
     public const int WM_MOUSEMOVE = 0x0200;
 
@@ -46,11 +40,6 @@ public static class StaticStuff
 
     [DllImport ("user32.dll")]
     public static extern bool GetCursorPos (out Point lpPoint);
-
-    public delegate bool ConsoleEventDelegate (int eventType);
-
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    public static extern bool SetConsoleCtrlHandler (ConsoleEventDelegate callback, bool add);
 
     public enum PROCESS_DPI_AWARENESS
     {
@@ -100,34 +89,33 @@ public static class StaticStuff
             return 96; // On Windows <8, just assume scaling 100%.
         }
     }
+}
 
-    // ============================================================================================
-    // ============================================================================================
-    // Geometric helpers. These all deal with Rectangles, Points, and X and Y values.
-    //
-
+internal static class GeometryUtil
+{
     // Return the signs of X and Y. This essentially gives us the "component direction" of
     // the point (N.B. the vector length is not "normalized" to a length 1 "unit vector" if
     // both the X and Y components are non-zero).
-    public static Point Sign (Point p) => new Point (Math.Sign (p.X), Math.Sign (p.Y));
+    public static Point Sign(Point p) => new Point(Math.Sign(p.X), Math.Sign(p.Y));
 
     // "Direction" vector from P1 to P2. X/Y of returned point will have values
     // of -1, 0, or 1 only (vector is not normalized to length 1).
-    public static Point Direction (Point P1, Point P2) => Sign (P2 - (Size) P1);
+    public static Point Direction(Point P1, Point P2) => Sign(P2 - (Size)P1);
 
     // If P is anywhere inside R, then OutsideDistance() returns (0,0).
     // Otherwise, it returns the (x,y) delta (sign is preserved) from P to the
     // nearest edge/corner of R. For Right and Bottom we must correct by 1,
     // since the Rectangle Right and Bottom are one larger than the largest
     // valid pixel.
+
     public static int OutsideXDistance(Rectangle R, Point P)
-        => Math.Max (Math.Min (0, P.X - R.Left), P.X - R.Right + 1);
-        
+        => Math.Max(Math.Min(0, P.X - R.Left), P.X - R.Right + 1);
+
     public static int OutsideYDistance(Rectangle R, Point P)
-        => Math.Max (Math.Min (0, P.Y - R.Top), P.Y - R.Bottom + 1);
-        
-    public static Point OutsideDistance (Rectangle R, Point P)
-        => new Point (OutsideXDistance(R,P), OutsideYDistance(R,P));
+        => Math.Max(Math.Min(0, P.Y - R.Top), P.Y - R.Bottom + 1);
+
+    public static Point OutsideDistance(Rectangle R, Point P)
+        => new Point(OutsideXDistance(R, P), OutsideYDistance(R, P));
 
     // This is sort-of the "opposite" of above. In a sense it "captures" the point to the
     // boundary/inside of the rectangle, rather than "excluding" it to the exterior of the rectangle.
@@ -135,15 +123,19 @@ public static class StaticStuff
     // If the point is outside the rectangle, then it returns the closest location on the
     // rectangle boundary to the Point. If Point is inside Rectangle, then it just returns
     // the point.
-    public static Point ClosestBoundaryPoint (this Rectangle R, Point P)
-        => new Point (
-            Math.Max (Math.Min (P.X, R.Right - 1), R.Left),
-            Math.Max (Math.Min (P.Y, R.Bottom - 1), R.Top));
+
+    public static Point ClosestBoundaryPoint(this Rectangle R, Point P)
+        => new Point(
+            Math.Max(Math.Min(P.X, R.Right - 1), R.Left),
+            Math.Max(Math.Min(P.Y, R.Bottom - 1), R.Top));
 
     // In which direction(s) is(are) the point outside of the rectangle? If P is
     // inside R, then this returns (0,0). Else X and/or Y can be either -1 or
     // +1, depending on which direction P is outside R.
-    public static Point OutsideDirection (Rectangle R, Point P) => Sign (OutsideDistance (R, P));
+    public static Point OutsideDirection(Rectangle R, Point P) => Sign(OutsideDistance(R, P));
+
+    public static bool OverlapX (Rectangle R1, Rectangle R2) => (R1.Left < R2.Right) && (R1.Right > R2.Left);
+    public static bool OverlapY (Rectangle R1, Rectangle R2) => (R1.Top < R2.Bottom) && (R1.Bottom > R2.Top);
 }
 
 // =======================================================================================================
@@ -184,19 +176,16 @@ public class SnagScreen
     public bool IsTopmost => Above.Count == 0;
     public bool IsBottommost => Below.Count == 0;
 
-    public bool OverlapX (Rectangle R1, Rectangle R2) => (R1.Left < R2.Right) && (R1.Right > R2.Left);
-    public bool OverlapY (Rectangle R1, Rectangle R2) => (R1.Top < R2.Bottom) && (R1.Bottom > R2.Top);
-
     // If s is immediately adjacent to (shares a border with) us, then add it to the
     // appropriate direction list. If s is not "touching" us, then it will not get added to
     // any list. s can be added to at most one list (hence use of "else if" instead of just
     // a sequence of "if's").
     public void AddDirectionTo (SnagScreen s)
     {
-        if ((R.Right == s.R.Left) && OverlapY (R, s.R)) ToRight.Add (s);
-        else if ((R.Left == s.R.Right) && OverlapY (R, s.R)) ToLeft.Add (s);
-        else if ((R.Top == s.R.Bottom) && OverlapX (R, s.R)) Above.Add (s);
-        else if ((R.Bottom == s.R.Top) && OverlapX (R, s.R)) Below.Add (s);
+        if ((R.Right == s.R.Left) && GeometryUtil.OverlapY (R, s.R)) ToRight.Add (s);
+        else if ((R.Left == s.R.Right) && GeometryUtil.OverlapY (R, s.R)) ToLeft.Add (s);
+        else if ((R.Top == s.R.Bottom) && GeometryUtil.OverlapX (R, s.R)) Above.Add (s);
+        else if ((R.Bottom == s.R.Top) && GeometryUtil.OverlapX (R, s.R)) Below.Add (s);
     }
 
     // Loop through Screen.AllScreens[] array to initialize ourselves.
@@ -244,13 +233,13 @@ public class SnagScreen
 
         foreach (var S in All)
         {
-            var DPIEffective = GetDpi (S.screen, DpiType.Effective);
+            var DPIEffective = NativeMethods.GetDpi (S.screen, NativeMethods.DpiType.Effective);
             var R = S.R;
 
             Console.WriteLine (
                 $"   {i}: ({R.Left},{R.Top})-({R.Right},{R.Bottom})   Size:({R.Width},{R.Height}) "+
                 $"L({AsString(S.ToLeft)}),R({AsString(S.ToRight)}),A({AsString(S.Above)}),B({AsString(S.Below)})    "+
-                $"DPI(Raw/Eff/Ang): {GetDpi(S.screen, DpiType.Raw)}/{DPIEffective}/{GetDpi(S.screen, DpiType.Angular)}  "+
+                $"DPI(Raw/Eff/Ang): {NativeMethods.GetDpi(S.screen, NativeMethods.DpiType.Raw)}/{DPIEffective}/{NativeMethods.GetDpi(S.screen, NativeMethods.DpiType.Angular)}  "+
                 $"Screen Scaling: {Math.Round(DPIEffective/96.0*100)}%   \r"); //  {S.DeviceName}     \r");
             ++i;
         }
@@ -309,7 +298,7 @@ public class SnagScreen
         if(Dir.X != 0) {
             // Find closest Left- or Right-most screen, in Y direction.
             foreach(var S in (Dir.X==1 ? LeftMost : RightMost)) {
-                int dist = Math.Abs(OutsideYDistance(S.R, Cursor));
+                int dist = Math.Abs(GeometryUtil.OutsideYDistance(S.R, Cursor));
                 if(dist < DistClosest) {
                     DistClosest = dist;
                     WS = S;
@@ -331,21 +320,21 @@ public class SnagScreen
 //
 //
 
-public class MouseUnSnag
+public class Program
 {
     private IntPtr LLMouse_hookhand = IntPtr.Zero;
     private Point LastMouse = new Point (0, 0);
     private IntPtr ThisModHandle = IntPtr.Zero;
     private int NJumps = 0;
 
-    private IntPtr SetHook (int HookNum, HookProc proc)
+    private IntPtr SetHook (int HookNum, NativeMethods.HookProc proc)
     {
         using (Process curProcess = Process.GetCurrentProcess ())
         using (ProcessModule curModule = curProcess.MainModule)
         {
             if (ThisModHandle == IntPtr.Zero)
-                ThisModHandle = GetModuleHandle (curModule.ModuleName);
-            return SetWindowsHookEx (HookNum, proc, ThisModHandle, 0);
+                ThisModHandle = NativeMethods.GetModuleHandle (curModule.ModuleName);
+            return NativeMethods.SetWindowsHookEx (HookNum, proc, ThisModHandle, 0);
         }
     }
 
@@ -354,7 +343,7 @@ public class MouseUnSnag
         if (hookHand == IntPtr.Zero)
             return;
 
-        UnhookWindowsHookEx (hookHand);
+        NativeMethods.UnhookWindowsHookEx (hookHand);
         hookHand = IntPtr.Zero;
     }
 
@@ -375,11 +364,11 @@ public class MouseUnSnag
         NewCursor = cursor; // Default is to not move cursor.
 			
         // Gather pertinent information about cursor, mouse, screens.
-        Point Dir = Direction (cursor, mouse);
-        SnagScreen cursorScreen = WhichScreen (cursor);
-        SnagScreen mouseScreen = WhichScreen (mouse);
+        Point Dir = GeometryUtil.Direction (cursor, mouse);
+        SnagScreen cursorScreen = SnagScreen.WhichScreen (cursor);
+        SnagScreen mouseScreen = SnagScreen.WhichScreen (mouse);
         bool IsStuck = (cursor != LastMouse) && (mouseScreen != cursorScreen);
-        Point StuckDirection = OutsideDirection (cursorScreen.R, mouse);
+        Point StuckDirection = GeometryUtil.OutsideDirection (cursorScreen.R, mouse);
 
         string StuckString = IsStuck ? "--STUCK--" : "         ";
 		
@@ -387,7 +376,7 @@ public class MouseUnSnag
 //            $"mouse:{mouse}  cursor:{cursor} (OnMon#{cursorScreen}/{mouseScreen}) last:{LastMouse}  " +
 //            $"#UnSnags {NJumps}   {StuckString}        \r");
 
-        Console.Write ($" StuckDirection/Distance{StuckDirection}/{OutsideDistance(cursorScreen.R, mouse)} " +
+        Console.Write ($" StuckDirection/Distance{StuckDirection}/{GeometryUtil.OutsideDistance(cursorScreen.R, mouse)} " +
             $"cur_mouse:{mouse}  prev_mouse:{LastMouse} ==? cursor:{cursor} (OnMon#{cursorScreen}/{mouseScreen})  " +
             $"#UnSnags {NJumps}   {StuckString}   \r");
 
@@ -397,7 +386,7 @@ public class MouseUnSnag
         if (!IsStuck)
             return false;
 
-        SnagScreen jumpScreen = ScreenInDirection (StuckDirection, cursorScreen.R);
+        SnagScreen jumpScreen = SnagScreen.ScreenInDirection (StuckDirection, cursorScreen.R);
 
         // If the mouse "location" (which can take on a value beyond the current
         // cursor screen) has a value, then it is "within" another valid screen
@@ -412,7 +401,7 @@ public class MouseUnSnag
         }
         else if (StuckDirection.X != 0)
         {
-            NewCursor = WrapPoint (StuckDirection, cursor);
+            NewCursor = SnagScreen.WrapPoint (StuckDirection, cursor);
         }
         else
             return false;
@@ -427,24 +416,24 @@ public class MouseUnSnag
     // position, to make it jump from one monitor to another.
     private IntPtr LLMouseHookCallback (int nCode, uint wParam, IntPtr lParam)
     {
-        if ((nCode < 0) || (wParam != WM_MOUSEMOVE) || UpdatingDisplaySettings)
+        if ((nCode < 0) || (wParam != NativeMethods.WM_MOUSEMOVE) || UpdatingDisplaySettings)
             goto ExitToNextHook;
 
-        var hookStruct = (MSLLHOOKSTRUCT) Marshal.PtrToStructure (lParam, typeof (MSLLHOOKSTRUCT));
+        var hookStruct = (NativeMethods.MSLLHOOKSTRUCT) Marshal.PtrToStructure (lParam, typeof (NativeMethods.MSLLHOOKSTRUCT));
         Point mouse = hookStruct.pt;
 
         // If we jump the cursor, then we return 1 here to tell the OS that we
         // have handled the message, so it doesn't call SetCursorPos() right
         // after we do, and "undo" our call to SetCursorPos().
-        if (GetCursorPos(out Point cursor) && CheckJumpCursor (mouse, cursor, out Point NewCursor)) {
-            SetCursorPos(NewCursor);
+        if (NativeMethods.GetCursorPos(out Point cursor) && CheckJumpCursor (mouse, cursor, out Point NewCursor)) {
+            NativeMethods.SetCursorPos(NewCursor);
             return (IntPtr) 1;
         }
 
         // Default is to let the OS handle the mouse events, when "return" does not happen in
         // if() clause above.
         ExitToNextHook:
-            return CallNextHookEx (LLMouse_hookhand, nCode, wParam, lParam);
+            return NativeMethods.CallNextHookEx (LLMouse_hookhand, nCode, wParam, lParam);
     }
 
     private bool UpdatingDisplaySettings = false;
@@ -460,18 +449,7 @@ public class MouseUnSnag
     }
 
     // Need to explicitly keep a reference to this, so it does not get "garbage collected."
-    private HookProc MouseHookDelegate = null;
-
-    // Catch program CTRL-C termination, and unhook the mouse event.
-    private ConsoleEventDelegate CTRL_C_handler;
-    private bool ConsoleEventCallback (int eventType)
-    {
-        Console.Write ("\nIn ConsoleEventCallback, Unhooking mouse events...");
-        UnsetHook (ref LLMouse_hookhand);
-        SystemEvents.DisplaySettingsChanged -= Event_DisplaySettingsChanged;
-        Console.WriteLine ("  Done.");
-        return false;
-    }
+    private NativeMethods.HookProc MouseHookDelegate = null;
 
     private void Run ()
     {
@@ -479,29 +457,22 @@ public class MouseUnSnag
         // physical pixels anyway, so we just ignore if the call fails.
         try
         {
-            SetProcessDpiAwareness (PROCESS_DPI_AWARENESS.Process_Per_Monitor_DPI_Aware);
+            NativeMethods.SetProcessDpiAwareness (NativeMethods.PROCESS_DPI_AWARENESS.Process_Per_Monitor_DPI_Aware);
         }
         catch (DllNotFoundException)
         {
             Console.WriteLine ("No SHCore.DLL. No problem.");
         }
 
-        // Make sure we catch CTRL-C hard-exit of program.
-        CTRL_C_handler = ConsoleEventCallback;
-        SetConsoleCtrlHandler (CTRL_C_handler, true);
-
-        //ShowScreens ();
         SnagScreen.Init (Screen.AllScreens);
         SnagScreen.ShowAll ();
 
         // Get notified of any screen configuration changes.
         SystemEvents.DisplaySettingsChanged += Event_DisplaySettingsChanged;
 
-        //ShowWindow(GetConsoleWindow(), SW_HIDE);
-
         // Keep a reference to the delegate, so it does not get garbage collected.
         MouseHookDelegate = LLMouseHookCallback;
-        LLMouse_hookhand = SetHook (WH_MOUSE_LL, MouseHookDelegate);
+        LLMouse_hookhand = SetHook (NativeMethods.WH_MOUSE_LL, MouseHookDelegate);
 
         Console.WriteLine ();
 
@@ -512,6 +483,7 @@ public class MouseUnSnag
 
         Console.WriteLine ("Exiting!!!");
         UnsetHook (ref LLMouse_hookhand);
+        SystemEvents.DisplaySettingsChanged -= Event_DisplaySettingsChanged;
     }
 
     [STAThread]
@@ -526,8 +498,10 @@ public class MouseUnSnag
                 return;
             }
 
-            var MUS = new MouseUnSnag();
-            MUS.Run();
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(defaultValue: false);
+
+            new Program().Run();
         }
     }
 }
