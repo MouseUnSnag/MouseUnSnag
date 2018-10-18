@@ -519,13 +519,16 @@ public class MouseUnSnag
     public static void Main ()
     {
         // Make sure the MouseUnSnag.exe has only one instance running at a time.
-        if ((new Mutex (true, "__MouseUnSnag_EXE__", out bool createdNew) == null) || !createdNew)
+        using (new Mutex(true, "__MouseUnSnag_EXE__", out bool createdNew))
         {
-            Console.WriteLine ("Already running!! Quitting this instance...");
-            return;
-        }
+            if (!createdNew)
+            {
+                Console.WriteLine("Already running!! Quitting this instance...");
+                return;
+            }
 
-        var MUS = new MouseUnSnag ();
-        MUS.Run (args);
+            var MUS = new MouseUnSnag();
+            MUS.Run();
+        }
     }
 }
