@@ -31,9 +31,7 @@ public static class StaticStuff
     public static extern IntPtr SetWindowsHookEx (int idHook, HookProc lpfn, IntPtr hMod, uint dwThreadId);
 
     [DllImport ("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    [
-        return :MarshalAs (UnmanagedType.Bool)
-    ]
+    [return: MarshalAs (UnmanagedType.Bool)]
     public static extern bool UnhookWindowsHookEx (IntPtr hhk);
 
     [DllImport ("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
@@ -44,7 +42,7 @@ public static class StaticStuff
 
     [DllImport ("user32.dll")]
     public static extern bool SetCursorPos (int X, int Y);
-    public static bool SetCursorPos (Point p) { return SetCursorPos (p.X, p.Y); }
+    public static bool SetCursorPos (Point p) => SetCursorPos (p.X, p.Y);
 
     [DllImport ("user32.dll")]
     public static extern bool GetCursorPos (out Point lpPoint);
@@ -337,8 +335,8 @@ public class MouseUnSnag
 {
     private IntPtr LLMouse_hookhand = IntPtr.Zero;
     private Point LastMouse = new Point (0, 0);
-    IntPtr ThisModHandle = IntPtr.Zero;
-    int NJumps = 0;
+    private IntPtr ThisModHandle = IntPtr.Zero;
+    private int NJumps = 0;
 
     private IntPtr SetHook (int HookNum, HookProc proc)
     {
@@ -372,7 +370,7 @@ public class MouseUnSnag
     // current mouse and cursor information) is handled in routines further below, and any
     // Screen changes are handled by the DisplaySettingsChanged event. There are no
     // hardware or OS/Win32 references or interactions here.
-    bool CheckJumpCursor (Point mouse, Point cursor, out Point NewCursor)
+    private bool CheckJumpCursor (Point mouse, Point cursor, out Point NewCursor)
     {
         NewCursor = cursor; // Default is to not move cursor.
 			
@@ -449,8 +447,9 @@ public class MouseUnSnag
             return CallNextHookEx (LLMouse_hookhand, nCode, wParam, lParam);
     }
 
-    bool UpdatingDisplaySettings=false;
-    void Event_DisplaySettingsChanged (object sender, EventArgs e)
+    private bool UpdatingDisplaySettings = false;
+
+    private void Event_DisplaySettingsChanged (object sender, EventArgs e)
     {
         UpdatingDisplaySettings=true;
         Console.WriteLine ("\nDisplay Settings Changed...");
