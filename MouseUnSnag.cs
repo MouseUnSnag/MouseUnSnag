@@ -515,6 +515,7 @@ public class MouseUnSnag
         UnsetHook (ref LLMouse_hookhand);
     }
 
+    [STAThread]
     public static void Main ()
     {
         // Make sure the MouseUnSnag.exe has only one instance running at a time.
