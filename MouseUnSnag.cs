@@ -479,7 +479,7 @@ public class Program
         // This is the one that runs "forever" while the application is alive, and handles
         // events, etc. This application is ABSOLUTELY ENTIRELY driven by the LLMouseHook
         // and DisplaySettingsChanged events.
-        Application.Run ();
+        Application.Run (new MyCustomApplicationContext());
 
         Console.WriteLine ("Exiting!!!");
         UnsetHook (ref LLMouse_hookhand);
@@ -503,5 +503,30 @@ public class Program
 
             new Program().Run();
         }
+    }
+}
+
+internal sealed class MyCustomApplicationContext : ApplicationContext
+{
+    private readonly NotifyIcon trayIcon;
+
+    public MyCustomApplicationContext()
+    {
+        trayIcon = new NotifyIcon
+        {
+            Icon = Resources.Icon,
+            ContextMenu = new ContextMenu
+            {
+                MenuItems =
+                {
+                    new MenuItem("Exit", delegate
+                    {
+                        trayIcon.Visible = false;
+                        Application.Exit();
+                    })
+                }
+            },
+            Visible = true
+        };
     }
 }
