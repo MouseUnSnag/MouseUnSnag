@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data.Linq;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
@@ -32,9 +31,7 @@ public static class StaticStuff
     public static extern IntPtr SetWindowsHookEx (int idHook, HookProc lpfn, IntPtr hMod, uint dwThreadId);
 
     [DllImport ("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    [
-        return :MarshalAs (UnmanagedType.Bool)
-    ]
+    [return: MarshalAs (UnmanagedType.Bool)]
     public static extern bool UnhookWindowsHookEx (IntPtr hhk);
 
     [DllImport ("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
@@ -45,17 +42,10 @@ public static class StaticStuff
 
     [DllImport ("user32.dll")]
     public static extern bool SetCursorPos (int X, int Y);
-    public static bool SetCursorPos (Point p) { return SetCursorPos (p.X, p.Y); }
+    public static bool SetCursorPos (Point p) => SetCursorPos (p.X, p.Y);
 
     [DllImport ("user32.dll")]
     public static extern bool GetCursorPos (out Point lpPoint);
-    //public static Point? GetCursorPos() => GetCursorPos(out Point P) ? P : null;
-
-    [DllImport ("kernel32.dll")]
-    static extern uint GetLastError ();
-
-    [DllImport ("kernel32", SetLastError = true, CharSet = CharSet.Auto)]
-    public static extern IntPtr LoadLibrary (string fileName);
 
     public delegate bool ConsoleEventDelegate (int eventType);
 
@@ -82,25 +72,16 @@ public static class StaticStuff
         public IntPtr dwExtraInfo;
     }
 
-    [DllImport ("kernel32.dll")]
-    public static extern IntPtr GetConsoleWindow ();
-
-    [DllImport ("user32.dll")]
-    public static extern bool ShowWindow (IntPtr hWnd, int nCmdShow);
-
-    private const int SW_HIDE = 0;
-    private const int SW_SHOW = 5;
-
     public enum DpiType
     {
         Effective = 0,
         Angular = 1,
-        Raw = 2,
+        Raw = 2
     }
 
     //https://msdn.microsoft.com/en-us/library/windows/desktop/dd145062(v=vs.85).aspx
     [DllImport ("User32.dll")]
-    public static extern IntPtr MonitorFromPoint ([In] System.Drawing.Point pt, [In] uint dwFlags);
+    public static extern IntPtr MonitorFromPoint ([In] Point pt, [In] uint dwFlags);
 
     //https://msdn.microsoft.com/en-us/library/windows/desktop/dn280510(v=vs.85).aspx
     [DllImport ("Shcore.dll")]
@@ -114,7 +95,7 @@ public static class StaticStuff
             GetDpiForMonitor (mon, dpiType, out uint dpiX, out uint dpiY);
             return dpiX;
         }
-        catch (System.DllNotFoundException)
+        catch (DllNotFoundException)
         {
             return 96; // On Windows <8, just assume scaling 100%.
         }
@@ -129,9 +110,6 @@ public static class StaticStuff
     // the point (N.B. the vector length is not "normalized" to a length 1 "unit vector" if
     // both the X and Y components are non-zero).
     public static Point Sign (Point p) => new Point (Math.Sign (p.X), Math.Sign (p.Y));
-
-    // 3-way Max()
-    public static int Max (int x, int y, int z) => Math.Max (x, Math.Max (y, z));
 
     // "Direction" vector from P1 to P2. X/Y of returned point will have values
     // of -1, 0, or 1 only (vector is not normalized to length 1).
@@ -166,11 +144,6 @@ public static class StaticStuff
     // inside R, then this returns (0,0). Else X and/or Y can be either -1 or
     // +1, depending on which direction P is outside R.
     public static Point OutsideDirection (Rectangle R, Point P) => Sign (OutsideDistance (R, P));
-
-    // Return TRUE if the Y value of P is within the Rectangle's Y bounds.
-    public static bool ContainsY (Rectangle R, Point P) => (P.Y >= R.Top) && (P.Y < R.Bottom);
-
-    public static bool ContainsX (Rectangle R, Point P) => (P.X >= R.Left) && (P.X < R.Right);
 }
 
 // =======================================================================================================
@@ -362,8 +335,8 @@ public class MouseUnSnag
 {
     private IntPtr LLMouse_hookhand = IntPtr.Zero;
     private Point LastMouse = new Point (0, 0);
-    IntPtr ThisModHandle = IntPtr.Zero;
-    int NJumps = 0;
+    private IntPtr ThisModHandle = IntPtr.Zero;
+    private int NJumps = 0;
 
     private IntPtr SetHook (int HookNum, HookProc proc)
     {
@@ -397,7 +370,7 @@ public class MouseUnSnag
     // current mouse and cursor information) is handled in routines further below, and any
     // Screen changes are handled by the DisplaySettingsChanged event. There are no
     // hardware or OS/Win32 references or interactions here.
-    bool CheckJumpCursor (Point mouse, Point cursor, out Point NewCursor)
+    private bool CheckJumpCursor (Point mouse, Point cursor, out Point NewCursor)
     {
         NewCursor = cursor; // Default is to not move cursor.
 			
@@ -474,8 +447,9 @@ public class MouseUnSnag
             return CallNextHookEx (LLMouse_hookhand, nCode, wParam, lParam);
     }
 
-    bool UpdatingDisplaySettings=false;
-    void Event_DisplaySettingsChanged (object sender, EventArgs e)
+    private bool UpdatingDisplaySettings = false;
+
+    private void Event_DisplaySettingsChanged (object sender, EventArgs e)
     {
         UpdatingDisplaySettings=true;
         Console.WriteLine ("\nDisplay Settings Changed...");
@@ -499,7 +473,7 @@ public class MouseUnSnag
         return false;
     }
 
-    private void Run (string[] args)
+    private void Run ()
     {
         // DPI Awareness API is not available on older OS's, but they work in
         // physical pixels anyway, so we just ignore if the call fails.
@@ -507,13 +481,13 @@ public class MouseUnSnag
         {
             SetProcessDpiAwareness (PROCESS_DPI_AWARENESS.Process_Per_Monitor_DPI_Aware);
         }
-        catch (System.DllNotFoundException)
+        catch (DllNotFoundException)
         {
             Console.WriteLine ("No SHCore.DLL. No problem.");
         }
 
         // Make sure we catch CTRL-C hard-exit of program.
-        CTRL_C_handler = new ConsoleEventDelegate (ConsoleEventCallback);
+        CTRL_C_handler = ConsoleEventCallback;
         SetConsoleCtrlHandler (CTRL_C_handler, true);
 
         //ShowScreens ();
@@ -529,7 +503,7 @@ public class MouseUnSnag
         MouseHookDelegate = LLMouseHookCallback;
         LLMouse_hookhand = SetHook (WH_MOUSE_LL, MouseHookDelegate);
 
-        Console.WriteLine ("");
+        Console.WriteLine ();
 
         // This is the one that runs "forever" while the application is alive, and handles
         // events, etc. This application is ABSOLUTELY ENTIRELY driven by the LLMouseHook
@@ -540,16 +514,20 @@ public class MouseUnSnag
         UnsetHook (ref LLMouse_hookhand);
     }
 
-    public static void Main (string[] args)
+    [STAThread]
+    public static void Main ()
     {
         // Make sure the MouseUnSnag.exe has only one instance running at a time.
-        if ((new Mutex (true, "__MouseUnSnag_EXE__", out bool createdNew) == null) || !createdNew)
+        using (new Mutex(true, "__MouseUnSnag_EXE__", out bool createdNew))
         {
-            Console.WriteLine ("Already running!! Quitting this instance...");
-            return;
-        }
+            if (!createdNew)
+            {
+                Console.WriteLine("Already running!! Quitting this instance...");
+                return;
+            }
 
-        var MUS = new MouseUnSnag ();
-        MUS.Run (args);
+            var MUS = new MouseUnSnag();
+            MUS.Run();
+        }
     }
 }
