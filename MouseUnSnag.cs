@@ -327,6 +327,8 @@ public class Program
     private IntPtr ThisModHandle = IntPtr.Zero;
     private int NJumps = 0;
 
+    public bool IsScreenWrapEnabled { get; set; }
+
     private IntPtr SetHook (int HookNum, NativeMethods.HookProc proc)
     {
         using (Process curProcess = Process.GetCurrentProcess ())
@@ -399,12 +401,14 @@ public class Program
         {
             NewCursor = jumpScreen.R.ClosestBoundaryPoint (cursor);
         }
-        else if (StuckDirection.X != 0)
+        else if (IsScreenWrapEnabled && StuckDirection.X != 0)
         {
             NewCursor = SnagScreen.WrapPoint (StuckDirection, cursor);
         }
         else
+        {
             return false;
+        }
 
         ++NJumps;
 		Console.Write($"\n -- JUMPED!!! --\n");
@@ -479,7 +483,7 @@ public class Program
         // This is the one that runs "forever" while the application is alive, and handles
         // events, etc. This application is ABSOLUTELY ENTIRELY driven by the LLMouseHook
         // and DisplaySettingsChanged events.
-        Application.Run (new MyCustomApplicationContext());
+        Application.Run (new MyCustomApplicationContext(this));
 
         Console.WriteLine ("Exiting!!!");
         UnsetHook (ref LLMouse_hookhand);
@@ -510,7 +514,7 @@ internal sealed class MyCustomApplicationContext : ApplicationContext
 {
     private readonly NotifyIcon trayIcon;
 
-    public MyCustomApplicationContext()
+    public MyCustomApplicationContext(Program program)
     {
         trayIcon = new NotifyIcon
         {
@@ -519,6 +523,16 @@ internal sealed class MyCustomApplicationContext : ApplicationContext
             {
                 MenuItems =
                 {
+                    new MenuItem("Wrap around monitors", (sender, _) =>
+                    {
+                        var item = (MenuItem) sender;
+                        program.IsScreenWrapEnabled = !program.IsScreenWrapEnabled;
+                        item.Checked = program.IsScreenWrapEnabled;
+                    })
+                    {
+                        Checked = program.IsScreenWrapEnabled
+                    },
+
                     new MenuItem("Exit", delegate
                     {
                         trayIcon.Visible = false;
