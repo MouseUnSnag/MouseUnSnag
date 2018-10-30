@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using Microsoft.Win32;
@@ -158,7 +159,6 @@ public class SnagScreen
     public override string ToString() => Num.ToString();
 
     public List<SnagScreen> ToLeft, ToRight, Above, Below;
-    public static string AsString(List<SnagScreen> L) => string.Join (",", L.Select (sn => sn.Num));
 
     // Initialize each SnagScreen from each member of Screen.AllScreens[] array.
     public SnagScreen (Screen S, int ScreenNum)
@@ -225,10 +225,11 @@ public class SnagScreen
         }
     }
 
-    public static void ShowAll ()
+    public static string GetScreenInformation ()
     {
+        var sb = new StringBuilder();
         int N = All.Length;
-        Console.WriteLine ($"There {((N>1)?"are":"is")} {N} SCREEN{((N>1)?"S":"")}:");
+        sb.AppendLine ($"There {((N>1)?"are":"is")} {N} SCREEN{((N>1)?"S":"")}:");
         int i = 0;
 
         foreach (var S in All)
@@ -236,18 +237,24 @@ public class SnagScreen
             var DPIEffective = NativeMethods.GetDpi (S.screen, NativeMethods.DpiType.Effective);
             var R = S.R;
 
-            Console.WriteLine (
+            sb.AppendLine(
                 $"   {i}: ({R.Left},{R.Top})-({R.Right},{R.Bottom})   Size:({R.Width},{R.Height}) "+
                 $"L({AsString(S.ToLeft)}),R({AsString(S.ToRight)}),A({AsString(S.Above)}),B({AsString(S.Below)})    "+
                 $"DPI(Raw/Eff/Ang): {NativeMethods.GetDpi(S.screen, NativeMethods.DpiType.Raw)}/{DPIEffective}/{NativeMethods.GetDpi(S.screen, NativeMethods.DpiType.Angular)}  "+
                 $"Screen Scaling: {Math.Round(DPIEffective/96.0*100)}%   \r"); //  {S.DeviceName}     \r");
             ++i;
         }
-        Console.WriteLine($"Rtmost({AsString(RightMost)}), Lfmost({AsString(LeftMost)}), "+
+
+        sb.AppendLine(
+            $"Rtmost({AsString(RightMost)}), Lfmost({AsString(LeftMost)}), "+
             $"Topmost({AsString(TopMost)}), Btmost({AsString(BottomMost)})   "+
             $"BoundingBox{BoundingBox}");
+
+        return sb.ToString ();
+
+        string AsString (List<SnagScreen> L) => string.Join (",", L.Select (sn => sn.Num));
     }
-    
+
     // Find which screen the point is on. If it is not on one, return null.
     public static SnagScreen WhichScreen (Point P)
     {
@@ -372,15 +379,9 @@ public class Program
         bool IsStuck = (cursor != LastMouse) && (mouseScreen != cursorScreen);
         Point StuckDirection = GeometryUtil.OutsideDirection (cursorScreen.R, mouse);
 
-        string StuckString = IsStuck ? "--STUCK--" : "         ";
-		
-//        Console.Write ($" FarOut{StuckDirection}/{OutsideDis//tance(cursorScreen.R, mouse)} " +
-//            $"mouse:{mouse}  cursor:{cursor} (OnMon#{cursorScreen}/{mouseScreen}) last:{LastMouse}  " +
-//            $"#UnSnags {NJumps}   {StuckString}        \r");
-
-        Console.Write ($" StuckDirection/Distance{StuckDirection}/{GeometryUtil.OutsideDistance(cursorScreen.R, mouse)} " +
+        Debug.WriteLine ($" StuckDirection/Distance{StuckDirection}/{GeometryUtil.OutsideDistance(cursorScreen.R, mouse)} " +
             $"cur_mouse:{mouse}  prev_mouse:{LastMouse} ==? cursor:{cursor} (OnMon#{cursorScreen}/{mouseScreen})  " +
-            $"#UnSnags {NJumps}   {StuckString}   \r");
+            $"#UnSnags {NJumps}   {(IsStuck ? "--STUCK--" : "         ")}   ");
 
 		LastMouse = mouse;
 
@@ -411,7 +412,7 @@ public class Program
         }
 
         ++NJumps;
-		Console.Write($"\n -- JUMPED!!! --\n");
+		Debug.WriteLine("\n -- JUMPED!!! --");
         return true;
     }
 
@@ -445,10 +446,9 @@ public class Program
     private void Event_DisplaySettingsChanged (object sender, EventArgs e)
     {
         UpdatingDisplaySettings=true;
-        Console.WriteLine ("\nDisplay Settings Changed...");
-        //ShowScreens ();
+        Debug.WriteLine ("\nDisplay Settings Changed...");
         SnagScreen.Init (Screen.AllScreens);
-        SnagScreen.ShowAll ();
+        Debug.WriteLine (SnagScreen.GetScreenInformation ());
         UpdatingDisplaySettings=false;
     }
 
@@ -465,11 +465,12 @@ public class Program
         }
         catch (DllNotFoundException)
         {
-            Console.WriteLine ("No SHCore.DLL. No problem.");
+            Debug.WriteLine ("No SHCore.DLL. No problem.");
         }
 
         SnagScreen.Init (Screen.AllScreens);
-        SnagScreen.ShowAll ();
+
+        Debug.WriteLine (SnagScreen.GetScreenInformation());
 
         // Get notified of any screen configuration changes.
         SystemEvents.DisplaySettingsChanged += Event_DisplaySettingsChanged;
@@ -478,14 +479,12 @@ public class Program
         MouseHookDelegate = LLMouseHookCallback;
         LLMouse_hookhand = SetHook (NativeMethods.WH_MOUSE_LL, MouseHookDelegate);
 
-        Console.WriteLine ();
-
         // This is the one that runs "forever" while the application is alive, and handles
         // events, etc. This application is ABSOLUTELY ENTIRELY driven by the LLMouseHook
         // and DisplaySettingsChanged events.
         Application.Run (new MyCustomApplicationContext(this));
 
-        Console.WriteLine ("Exiting!!!");
+        Debug.WriteLine ("Exiting!!!");
         UnsetHook (ref LLMouse_hookhand);
         SystemEvents.DisplaySettingsChanged -= Event_DisplaySettingsChanged;
     }
