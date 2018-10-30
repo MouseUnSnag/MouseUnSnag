@@ -497,7 +497,11 @@ public class Program
         {
             if (!createdNew)
             {
-                Console.WriteLine("Already running!! Quitting this instance...");
+                MessageBox.Show(
+                    "MouseUnSnag is already running!! Quitting this instance...",
+                    "MouseUnSnag",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
                 return;
             }
 
