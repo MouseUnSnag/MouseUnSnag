@@ -373,7 +373,6 @@ public class Program
         NewCursor = cursor; // Default is to not move cursor.
 			
         // Gather pertinent information about cursor, mouse, screens.
-        Point Dir = GeometryUtil.Direction (cursor, mouse);
         SnagScreen cursorScreen = SnagScreen.WhichScreen (cursor);
         SnagScreen mouseScreen = SnagScreen.WhichScreen (mouse);
         bool IsStuck = (cursor != LastMouse) && (mouseScreen != cursorScreen);
