@@ -15,6 +15,8 @@ using System.Windows.Forms;
 using Microsoft.Win32;
 using MouseUnSnag.Properties;
 
+namespace MouseUnSnag
+{ 
 public static class NativeMethods
 {
     public const int WH_MOUSE_LL = 14; // Win32 low-level mouse event hook ID.
@@ -545,4 +547,5 @@ internal sealed class MyCustomApplicationContext : ApplicationContext
             Visible = true
         };
     }
+}
 }
