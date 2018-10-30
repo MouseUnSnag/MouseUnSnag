@@ -182,7 +182,7 @@ public class SnagScreen
     // a sequence of "if's").
     public void AddDirectionTo (SnagScreen s)
     {
-        if ((R.Right == s.R.Left) && GeometryUtil.OverlapY (R, s.R)) ToRight.Add (s);
+        if      ((R.Right == s.R.Left) && GeometryUtil.OverlapY (R, s.R)) ToRight.Add (s);
         else if ((R.Left == s.R.Right) && GeometryUtil.OverlapY (R, s.R)) ToLeft.Add (s);
         else if ((R.Top == s.R.Bottom) && GeometryUtil.OverlapX (R, s.R)) Above.Add (s);
         else if ((R.Bottom == s.R.Top) && GeometryUtil.OverlapX (R, s.R)) Below.Add (s);
@@ -492,7 +492,7 @@ public class Program
     public static void Main ()
     {
         // Make sure the MouseUnSnag.exe has only one instance running at a time.
-        using (new Mutex(true, "__MouseUnSnag_EXE__", out bool createdNew))
+        using (new Mutex(initiallyOwned: true, "__MouseUnSnag_EXE__", out bool createdNew))
         {
             if (!createdNew)
             {
