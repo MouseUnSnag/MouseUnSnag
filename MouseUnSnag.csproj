@@ -43,13 +43,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MouseUnSnag.cs" />
+    <Compile Include="GeometryUtil.cs" />
+    <Compile Include="MyCustomApplicationContext.cs" />
+    <Compile Include="NativeMethods.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="SnagScreen.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="LICENSE" />
