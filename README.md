@@ -6,15 +6,15 @@ This is a relatively simple, one-file, command-line C# program that solves the p
 
 You can download and run this project's "released" executable (currently less than 15Kbytes!!)  [RELEASE LINK](https://github.com/dale-roberts/MouseUnSnag/releases), or click on "release" in the GitHub GUI above.
 
-If you like, you may instead compile the program at the command line. It requires at least version 7 of the C# compiler. You can get the latest version of the command-line C# compiler (no need to install the whole Visual Studio!!) using NuGet ([Latest NuGet.exe](https://dist.nuget.org/win-x86-commandline/latest/nuget.exe)), from a Windows CMD command line:
+If you like, you may instead compile the program at the command line. It requires at least version 7 of the C# compiler, and an up to date .NET Framework SDK and targeting pack. You can install these with [Visual Studio Installer](https://docs.microsoft.com/en-us/visualstudio/install/install-visual-studio)). Make sure to select ".NET Framework x.y.z SDK" and ".NET Framework x.y.z targeting pack" under individual components.
+
+This will install the C# compiler, which you can access using the "Developer Command Prompt" n the start menu. You can then run the following command in the source repository's root directory to build the solution:
+
 ```
-nuget install Microsoft.Net.Compilers
+MSBuild MouseUnSnag.sln
 ```
-This will install the C# compiler in a subdirectory under your current folder. Assuming the version you just installed was 2.6.1, and assuming the MouseUnSnag.cs source code is in your current directory, you could then compile the program like this:
-```
-Microsoft.Net.Compilers.2.6.1\tools\csc.exe MouseUnSnag.cs
-```
-Then you can run the program by just typing the name of the executable, **MouseUnSnag**. That's it!!
+
+The executable is build in the `bin` (`debug`) by default. You can run the program by just typing the name of the executable, `.\bin\Debug\MouseUnSnag`. That's it!!
 
 ## What does it do?
 The program endeavors to fix two separate problems related to multiple monitors, which were brought up in a couple of **superuser.com** posts. The respective authors also provided nice graphical representations of the problems.
