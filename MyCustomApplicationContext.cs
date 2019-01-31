@@ -21,6 +21,26 @@ namespace MouseUnSnag
                 {
                     MenuItems =
                     {
+                        new MenuItem("UnStick from corners", (sender, _) =>
+                        {
+                            var item = (MenuItem) sender;
+                            program.IsUnstickEnabled = !program.IsUnstickEnabled;
+                            item.Checked = program.IsUnstickEnabled;
+                        })
+                        {
+                            Checked = program.IsUnstickEnabled
+                        },
+
+                        new MenuItem("Jump between monitors", (sender, _) =>
+                        {
+                            var item = (MenuItem) sender;
+                            program.IsJumpEnabled = !program.IsJumpEnabled;
+                            item.Checked = program.IsJumpEnabled;
+                        })
+                        {
+                            Checked = program.IsJumpEnabled
+                        },
+
                         new MenuItem("Wrap around monitors", (sender, _) =>
                         {
                             var item = (MenuItem) sender;
