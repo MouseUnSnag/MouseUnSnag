@@ -164,11 +164,11 @@ namespace MouseUnSnag
         //{
         //}
 
-        // Find the best point to "wrap" around the cursor, either horizontally or
+        // Find the best screen to "wrap" around the cursor, either horizontally or
         // vertically. We consider only the "OuterMost" screens. For instance, if
         // the mouse is moving to the left, we consider only the screens in the
         // RightMost[] array.
-        public static Point WrapPoint(Point Dir, Point Cursor)
+        public static SnagScreen WrapScreen(Point Dir, Point Cursor)
         {
             int DistClosest = int.MaxValue;
             SnagScreen WS = null; // Our "wrap screen".
@@ -182,12 +182,11 @@ namespace MouseUnSnag
                         WS = S;
                     }
                 }
-                return WS.R.ClosestBoundaryPoint(new Point(Dir.X==1?WS.R.Left:WS.R.Right, Cursor.Y));
+                return WS;
             }
 
-            // We should never get here, but if we do, just return the current
-            // Cursor location.
-            return Cursor;
+            // We should never get here, but if we do, just return the first screen.
+            return All[0];
         }
     }
 }

@@ -22,7 +22,11 @@ namespace MouseUnSnag
         private IntPtr ThisModHandle = IntPtr.Zero;
         private int NJumps = 0;
 
-        public bool IsScreenWrapEnabled { get; set; }
+        // Command line option flags
+
+        public bool IsUnstickEnabled { get; set; } = true;
+        public bool IsJumpEnabled { get; set; } = true;
+        public bool IsScreenWrapEnabled { get; set; } = true;
 
         private IntPtr SetHook (int HookNum, NativeMethods.HookProc proc)
         {
@@ -83,15 +87,30 @@ namespace MouseUnSnag
             // bounds, so just jump to it!
             if (mouseScreen != null)
             {
+                if (!IsUnstickEnabled)
+                    return false;
                 NewCursor = mouse;
             }
             else if (jumpScreen != null)
             {
+                if (!IsJumpEnabled)
+                    return false;
                 NewCursor = jumpScreen.R.ClosestBoundaryPoint (cursor);
             }
-            else if (IsScreenWrapEnabled && StuckDirection.X != 0)
+            else if (StuckDirection.X != 0)
             {
-                NewCursor = SnagScreen.WrapPoint (StuckDirection, cursor);
+                if (!IsScreenWrapEnabled)
+                    return false;
+
+                SnagScreen wrapScreen = SnagScreen.WrapScreen (StuckDirection, cursor);
+                Point wrapPoint = new Point(
+                    StuckDirection.X==1?wrapScreen.R.Left:wrapScreen.R.Right - 1, cursor.Y);
+
+                // Don't wrap cursor if jumping is disabled and it would need to jump.
+                if (!IsJumpEnabled && !wrapScreen.R.Contains(wrapPoint))
+                    return false;
+
+                NewCursor = wrapScreen.R.ClosestBoundaryPoint(wrapPoint);
             }
             else
             {
@@ -142,7 +161,7 @@ namespace MouseUnSnag
         // Need to explicitly keep a reference to this, so it does not get "garbage collected."
         private NativeMethods.HookProc MouseHookDelegate = null;
 
-        private void Run ()
+        private void Run (string[] args)
         {
             // DPI Awareness API is not available on older OS's, but they work in
             // physical pixels anyway, so we just ignore if the call fails.
@@ -153,6 +172,43 @@ namespace MouseUnSnag
             catch (DllNotFoundException)
             {
                 Debug.WriteLine ("No SHCore.DLL. No problem.");
+            }
+
+            // Parse command line arguments
+            foreach (string arg in args)
+            {
+                switch (arg)
+                {
+                    case "-s":
+                        IsUnstickEnabled = false;
+                        break;
+                    case "+s":
+                        IsUnstickEnabled = true;
+                        break;
+                    case "-j":
+                        IsJumpEnabled = false;
+                        break;
+                    case "+j":
+                        IsJumpEnabled = true;
+                        break;
+                    case "-w":
+                        IsScreenWrapEnabled = false;
+                        break;
+                    case "+w":
+                        IsScreenWrapEnabled = true;
+                        break;
+                    default:
+                        string exeName = Environment.GetCommandLineArgs()[0];
+                        Console.WriteLine($"Usage: {exeName} [options ...]");
+                        Console.WriteLine("\t-s    Disables mouse un-sticking.");
+                        Console.WriteLine("\t+s    Enables mouse un-sticking. Default.");
+                        Console.WriteLine("\t-j    Disables mouse jumping.");
+                        Console.WriteLine("\t+j    Enables mouse jumping. Default.");
+                        Console.WriteLine("\t-w    Disables mouse wrapping.");
+                        Console.WriteLine("\t+w    Enables mouse wrapping. Default.");
+                        Environment.Exit(1);
+                        break;
+                }
             }
 
             SnagScreen.Init (Screen.AllScreens);
@@ -177,7 +233,7 @@ namespace MouseUnSnag
         }
 
         [STAThread]
-        public static void Main ()
+        public static void Main (string[] args)
         {
             // Make sure the MouseUnSnag.exe has only one instance running at a time.
             using (new Mutex(initiallyOwned: true, "__MouseUnSnag_EXE__", out bool createdNew))
@@ -195,7 +251,7 @@ namespace MouseUnSnag
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(defaultValue: false);
 
-                new Program().Run();
+                new Program().Run(args);
             }
         }
     }
