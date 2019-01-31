@@ -180,7 +180,7 @@ namespace MouseUnSnag
                     if(dist < DistClosest) {
                         DistClosest = dist;
                         WS = S;
-                    }                
+                    }
                 }
                 return WS.R.ClosestBoundaryPoint(new Point(Dir.X==1?WS.R.Left:WS.R.Right, Cursor.Y));
             }

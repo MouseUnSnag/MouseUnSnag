@@ -59,7 +59,7 @@ namespace MouseUnSnag
         private bool CheckJumpCursor (Point mouse, Point cursor, out Point NewCursor)
         {
             NewCursor = cursor; // Default is to not move cursor.
-			
+
             // Gather pertinent information about cursor, mouse, screens.
             SnagScreen cursorScreen = SnagScreen.WhichScreen (cursor);
             SnagScreen mouseScreen = SnagScreen.WhichScreen (mouse);
