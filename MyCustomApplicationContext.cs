@@ -60,6 +60,11 @@ namespace MouseUnSnag
                 },
                 Visible = true
             };
+
+			// Update the number of unsnags displayed when hovering over the tray icon
+            trayIcon.MouseMove += new MouseEventHandler((sender, e) => {
+                trayIcon.Text = $"Unsnags: {program.NJumps}";
+            });
         }
     }
 }

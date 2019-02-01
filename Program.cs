@@ -20,7 +20,7 @@ namespace MouseUnSnag
         private IntPtr LLMouse_hookhand = IntPtr.Zero;
         private Point LastMouse = new Point (0, 0);
         private IntPtr ThisModHandle = IntPtr.Zero;
-        private int NJumps = 0;
+        public int NJumps { get; private set; } = 0;
 
         // Command line option flags
 
