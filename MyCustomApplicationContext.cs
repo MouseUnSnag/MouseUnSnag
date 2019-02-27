@@ -16,7 +16,7 @@ namespace MouseUnSnag
         {
             trayIcon = new NotifyIcon
             {
-                Icon = Resources.Icon,
+                Icon = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath),
                 ContextMenu = new ContextMenu
                 {
                     MenuItems =
@@ -61,7 +61,7 @@ namespace MouseUnSnag
                 Visible = true
             };
 
-			// Update the number of unsnags displayed when hovering over the tray icon
+            // Update the number of unsnags displayed when hovering over the tray icon
             trayIcon.MouseMove += new MouseEventHandler((sender, e) => {
                 trayIcon.Text = $"Unsnags: {program.NJumps}";
             });
