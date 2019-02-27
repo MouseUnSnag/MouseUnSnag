@@ -8,6 +8,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>MouseUnSnag</RootNamespace>
     <AssemblyName>MouseUnSnag</AssemblyName>
+    <ApplicationIcon>mouse.ico</ApplicationIcon>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
