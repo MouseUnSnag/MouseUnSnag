@@ -58,7 +58,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandLine\CommandLineParser.cs" />
+    <Compile Include="CommandLine\Options.cs" />
     <Compile Include="GeometryUtil.cs" />
+    <Compile Include="Hooking\HookHandler.cs" />
     <Compile Include="MyCustomApplicationContext.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Program.cs" />
@@ -103,5 +106,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

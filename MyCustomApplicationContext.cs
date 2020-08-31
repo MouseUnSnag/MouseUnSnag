@@ -4,6 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 using System.Windows.Forms;
+using MouseUnSnag.CommandLine;
 using MouseUnSnag.Properties;
 
 namespace MouseUnSnag
@@ -12,7 +13,7 @@ namespace MouseUnSnag
     {
         private readonly NotifyIcon _trayIcon;
 
-        public MyCustomApplicationContext(Program program)
+        public MyCustomApplicationContext(Options options)
         {
             _trayIcon = new NotifyIcon
             {
@@ -24,31 +25,31 @@ namespace MouseUnSnag
                         new MenuItem("UnStick from corners", (sender, _) =>
                         {
                             var item = (MenuItem) sender;
-                            program.IsUnstickEnabled = !program.IsUnstickEnabled;
-                            item.Checked = program.IsUnstickEnabled;
+                            options.Unstick = !options.Unstick;
+                            item.Checked = options.Unstick;
                         })
                         {
-                            Checked = program.IsUnstickEnabled
+                            Checked = options.Unstick
                         },
 
                         new MenuItem("Jump between monitors", (sender, _) =>
                         {
                             var item = (MenuItem) sender;
-                            program.IsJumpEnabled = !program.IsJumpEnabled;
-                            item.Checked = program.IsJumpEnabled;
+                            options.Jump = !options.Jump;
+                            item.Checked = options.Jump;
                         })
                         {
-                            Checked = program.IsJumpEnabled
+                            Checked = options.Jump
                         },
 
                         new MenuItem("Wrap around monitors", (sender, _) =>
                         {
                             var item = (MenuItem) sender;
-                            program.IsScreenWrapEnabled = !program.IsScreenWrapEnabled;
-                            item.Checked = program.IsScreenWrapEnabled;
+                            options.Wrap = !options.Wrap;
+                            item.Checked = options.Wrap;
                         })
                         {
-                            Checked = program.IsScreenWrapEnabled
+                            Checked = options.Wrap
                         },
 
                         new MenuItem("Exit", delegate
