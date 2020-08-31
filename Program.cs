@@ -65,9 +65,10 @@ namespace MouseUnSnag
             NewCursor = cursor; // Default is to not move cursor.
 
             // Gather pertinent information about cursor, mouse, screens.
+            SnagScreen lastScreen = SnagScreen.WhichScreen(LastMouse);
             SnagScreen cursorScreen = SnagScreen.WhichScreen (cursor);
             SnagScreen mouseScreen = SnagScreen.WhichScreen (mouse);
-            bool IsStuck = (cursor != LastMouse) && (mouseScreen != cursorScreen);
+            bool IsStuck = (cursor != LastMouse) && (mouseScreen != cursorScreen) || (mouseScreen != lastScreen);
             Point StuckDirection = GeometryUtil.OutsideDirection (cursorScreen.R, mouse);
 
             Debug.WriteLine ($" StuckDirection/Distance{StuckDirection}/{GeometryUtil.OutsideDistance(cursorScreen.R, mouse)} " +
@@ -89,7 +90,18 @@ namespace MouseUnSnag
             {
                 if (!IsUnstickEnabled)
                     return false;
-                NewCursor = mouse;
+
+                if (lastScreen != mouseScreen && lastScreen != null)
+                {
+                    var newCursor = mouse;
+                    newCursor.Y = newCursor.Y * mouseScreen.EffectiveDpi / lastScreen.EffectiveDpi;
+                    Debug.WriteLine($"R: {newCursor}, {lastScreen.EffectiveDpi}>{mouseScreen.EffectiveDpi}");
+                    NewCursor = newCursor;
+                }
+                else
+                {
+                    NewCursor = mouse;
+                }
             }
             else if (jumpScreen != null)
             {

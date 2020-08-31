@@ -29,11 +29,14 @@ namespace MouseUnSnag
         public Rectangle R => screen.Bounds; // Shortcut to screen.Bounds.
         public override string ToString() => Num.ToString();
 
+        public int EffectiveDpi { get; }
+
         public List<SnagScreen> ToLeft, ToRight, Above, Below;
 
         // Initialize each SnagScreen from each member of Screen.AllScreens[] array.
         public SnagScreen (Screen S, int ScreenNum)
         {
+            EffectiveDpi = (int) NativeMethods.GetDpi(S, NativeMethods.DpiType.Effective);
             screen = S;
             Num = ScreenNum;
             ToLeft = new List<SnagScreen> ();
