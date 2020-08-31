@@ -13,7 +13,7 @@ using MouseUnSnag.CommandLine;
 namespace MouseUnSnag
 {
 
-    public class Program
+    public static class Program
     {
         [STAThread]
         public static int Main()
