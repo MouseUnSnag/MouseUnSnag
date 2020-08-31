@@ -51,7 +51,7 @@ namespace MouseUnSnag
         // +1, depending on which direction P is outside R.
         public static Point OutsideDirection(Rectangle R, Point P) => Sign(OutsideDistance(R, P));
 
-        public static bool OverlapX (Rectangle R1, Rectangle R2) => (R1.Left < R2.Right) && (R1.Right > R2.Left);
-        public static bool OverlapY (Rectangle R1, Rectangle R2) => (R1.Top < R2.Bottom) && (R1.Bottom > R2.Top);
+        public static bool OverlapX(Rectangle R1, Rectangle R2) => (R1.Left < R2.Right) && (R1.Right > R2.Left);
+        public static bool OverlapY(Rectangle R1, Rectangle R2) => (R1.Top < R2.Bottom) && (R1.Bottom > R2.Top);
     }
 }

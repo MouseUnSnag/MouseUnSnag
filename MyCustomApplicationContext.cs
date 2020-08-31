@@ -10,11 +10,11 @@ namespace MouseUnSnag
 {
     internal sealed class MyCustomApplicationContext : ApplicationContext
     {
-        private readonly NotifyIcon trayIcon;
+        private readonly NotifyIcon _trayIcon;
 
         public MyCustomApplicationContext(Program program)
         {
-            trayIcon = new NotifyIcon
+            _trayIcon = new NotifyIcon
             {
                 Icon = Resources.Icon,
                 ContextMenu = new ContextMenu
@@ -53,7 +53,7 @@ namespace MouseUnSnag
 
                         new MenuItem("Exit", delegate
                         {
-                            trayIcon.Visible = false;
+                            _trayIcon.Visible = false;
                             Application.Exit();
                         })
                     }

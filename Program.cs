@@ -17,10 +17,10 @@ namespace MouseUnSnag
 
     public class Program
     {
-        private IntPtr LLMouse_hookhand = IntPtr.Zero;
-        private Point LastMouse = new Point (0, 0);
-        private IntPtr ThisModHandle = IntPtr.Zero;
-        private int NJumps = 0;
+        private IntPtr _llMouseHookhand = IntPtr.Zero;
+        private Point _lastMouse = new Point(0, 0);
+        private IntPtr _thisModHandle = IntPtr.Zero;
+        private int _nJumps;
 
         // Command line option flags
 
@@ -28,23 +28,23 @@ namespace MouseUnSnag
         public bool IsJumpEnabled { get; set; } = true;
         public bool IsScreenWrapEnabled { get; set; } = true;
 
-        private IntPtr SetHook (int HookNum, NativeMethods.HookProc proc)
+        private IntPtr SetHook(int HookNum, NativeMethods.HookProc proc)
         {
-            using (Process curProcess = Process.GetCurrentProcess ())
-            using (ProcessModule curModule = curProcess.MainModule)
+            using (var curProcess = Process.GetCurrentProcess())
+            using (var curModule = curProcess.MainModule)
             {
-                if (ThisModHandle == IntPtr.Zero)
-                    ThisModHandle = NativeMethods.GetModuleHandle (curModule.ModuleName);
-                return NativeMethods.SetWindowsHookEx (HookNum, proc, ThisModHandle, 0);
+                if (_thisModHandle == IntPtr.Zero)
+                    _thisModHandle = NativeMethods.GetModuleHandle(curModule.ModuleName);
+                return NativeMethods.SetWindowsHookEx(HookNum, proc, _thisModHandle, 0);
             }
         }
 
-        private void UnsetHook (ref IntPtr hookHand)
+        private static void UnsetHook(ref IntPtr hookHand)
         {
             if (hookHand == IntPtr.Zero)
                 return;
 
-            NativeMethods.UnhookWindowsHookEx (hookHand);
+            NativeMethods.UnhookWindowsHookEx(hookHand);
             hookHand = IntPtr.Zero;
         }
 
@@ -60,28 +60,28 @@ namespace MouseUnSnag
         // current mouse and cursor information) is handled in routines further below, and any
         // Screen changes are handled by the DisplaySettingsChanged event. There are no
         // hardware or OS/Win32 references or interactions here.
-        private bool CheckJumpCursor (Point mouse, Point cursor, out Point NewCursor)
+        private bool CheckJumpCursor(Point mouse, Point cursor, out Point NewCursor)
         {
             NewCursor = cursor; // Default is to not move cursor.
 
             // Gather pertinent information about cursor, mouse, screens.
-            SnagScreen lastScreen = SnagScreen.WhichScreen(LastMouse);
-            SnagScreen cursorScreen = SnagScreen.WhichScreen (cursor);
-            SnagScreen mouseScreen = SnagScreen.WhichScreen (mouse);
-            bool IsStuck = (cursor != LastMouse) && (mouseScreen != cursorScreen) || (mouseScreen != lastScreen);
-            Point StuckDirection = GeometryUtil.OutsideDirection (cursorScreen.R, mouse);
+            var lastScreen = SnagScreen.WhichScreen(_lastMouse);
+            var cursorScreen = SnagScreen.WhichScreen(cursor);
+            var mouseScreen = SnagScreen.WhichScreen(mouse);
+            var isStuck = (cursor != _lastMouse) && (mouseScreen != cursorScreen) || (mouseScreen != lastScreen);
+            var stuckDirection = GeometryUtil.OutsideDirection(cursorScreen.R, mouse);
 
-            Debug.WriteLine ($" StuckDirection/Distance{StuckDirection}/{GeometryUtil.OutsideDistance(cursorScreen.R, mouse)} " +
-                             $"cur_mouse:{mouse}  prev_mouse:{LastMouse} ==? cursor:{cursor} (OnMon#{cursorScreen}/{mouseScreen})  " +
-                             $"#UnSnags {NJumps}   {(IsStuck ? "--STUCK--" : "         ")}   ");
+            Debug.WriteLine($" StuckDirection/Distance{stuckDirection}/{GeometryUtil.OutsideDistance(cursorScreen.R, mouse)} " +
+                             $"cur_mouse:{mouse}  prev_mouse:{_lastMouse} ==? cursor:{cursor} (OnMon#{cursorScreen}/{mouseScreen})  " +
+                             $"#UnSnags {_nJumps}   {(isStuck ? "--STUCK--" : "         ")}   ");
 
-            LastMouse = mouse;
+            _lastMouse = mouse;
 
             // Let caller know we did NOT jump the cursor.
-            if (!IsStuck)
+            if (!isStuck)
                 return false;
 
-            SnagScreen jumpScreen = SnagScreen.ScreenInDirection (StuckDirection, cursorScreen.R);
+            var jumpScreen = SnagScreen.ScreenInDirection(stuckDirection, cursorScreen.R);
 
             // If the mouse "location" (which can take on a value beyond the current
             // cursor screen) has a value, then it is "within" another valid screen
@@ -107,16 +107,16 @@ namespace MouseUnSnag
             {
                 if (!IsJumpEnabled)
                     return false;
-                NewCursor = jumpScreen.R.ClosestBoundaryPoint (cursor);
+                NewCursor = jumpScreen.R.ClosestBoundaryPoint(cursor);
             }
-            else if (StuckDirection.X != 0)
+            else if (stuckDirection.X != 0)
             {
                 if (!IsScreenWrapEnabled)
                     return false;
 
-                SnagScreen wrapScreen = SnagScreen.WrapScreen (StuckDirection, cursor);
-                Point wrapPoint = new Point(
-                    StuckDirection.X==1?wrapScreen.R.Left:wrapScreen.R.Right - 1, cursor.Y);
+                var wrapScreen = SnagScreen.WrapScreen(stuckDirection, cursor);
+                var wrapPoint = new Point(
+                    stuckDirection.X == 1 ? wrapScreen.R.Left : wrapScreen.R.Right - 1, cursor.Y);
 
                 // Don't wrap cursor if jumping is disabled and it would need to jump.
                 if (!IsJumpEnabled && !wrapScreen.R.Contains(wrapPoint))
@@ -129,7 +129,7 @@ namespace MouseUnSnag
                 return false;
             }
 
-            ++NJumps;
+            ++_nJumps;
             Debug.WriteLine("\n -- JUMPED!!! --");
             return true;
         }
@@ -137,57 +137,58 @@ namespace MouseUnSnag
         // Called whenever the mouse moves. This routine leans entirely on the
         // CheckJumpCursor() routine to see if there is any need to "mess with" the cursor
         // position, to make it jump from one monitor to another.
-        private IntPtr LLMouseHookCallback (int nCode, uint wParam, IntPtr lParam)
+        private IntPtr LlMouseHookCallback(int nCode, uint wParam, IntPtr lParam)
         {
-            if ((nCode < 0) || (wParam != NativeMethods.WM_MOUSEMOVE) || UpdatingDisplaySettings)
+            if ((nCode < 0) || (wParam != NativeMethods.WmMousemove) || _updatingDisplaySettings)
                 goto ExitToNextHook;
 
-            var hookStruct = (NativeMethods.MSLLHOOKSTRUCT) Marshal.PtrToStructure (lParam, typeof (NativeMethods.MSLLHOOKSTRUCT));
-            Point mouse = hookStruct.pt;
+            var hookStruct = (NativeMethods.Msllhookstruct)Marshal.PtrToStructure(lParam, typeof(NativeMethods.Msllhookstruct));
+            var mouse = hookStruct.pt;
 
             // If we jump the cursor, then we return 1 here to tell the OS that we
             // have handled the message, so it doesn't call SetCursorPos() right
             // after we do, and "undo" our call to SetCursorPos().
-            if (NativeMethods.GetCursorPos(out Point cursor) && CheckJumpCursor (mouse, cursor, out Point NewCursor)) {
-                NativeMethods.SetCursorPos(NewCursor);
-                return (IntPtr) 1;
+            if (NativeMethods.GetCursorPos(out var cursor) && CheckJumpCursor(mouse, cursor, out var newCursor))
+            {
+                NativeMethods.SetCursorPos(newCursor);
+                return (IntPtr)1;
             }
 
-            // Default is to let the OS handle the mouse events, when "return" does not happen in
-            // if() clause above.
-            ExitToNextHook:
-            return NativeMethods.CallNextHookEx (LLMouse_hookhand, nCode, wParam, lParam);
+        // Default is to let the OS handle the mouse events, when "return" does not happen in
+        // if() clause above.
+        ExitToNextHook:
+            return NativeMethods.CallNextHookEx(_llMouseHookhand, nCode, wParam, lParam);
         }
 
-        private bool UpdatingDisplaySettings = false;
+        private bool _updatingDisplaySettings;
 
-        private void Event_DisplaySettingsChanged (object sender, EventArgs e)
+        private void Event_DisplaySettingsChanged(object sender, EventArgs e)
         {
-            UpdatingDisplaySettings=true;
-            Debug.WriteLine ("\nDisplay Settings Changed...");
-            SnagScreen.Init (Screen.AllScreens);
-            Debug.WriteLine (SnagScreen.GetScreenInformation ());
-            UpdatingDisplaySettings=false;
+            _updatingDisplaySettings = true;
+            Debug.WriteLine("\nDisplay Settings Changed...");
+            SnagScreen.Init(Screen.AllScreens);
+            Debug.WriteLine(SnagScreen.GetScreenInformation());
+            _updatingDisplaySettings = false;
         }
 
         // Need to explicitly keep a reference to this, so it does not get "garbage collected."
-        private NativeMethods.HookProc MouseHookDelegate = null;
+        private NativeMethods.HookProc _mouseHookDelegate;
 
-        private void Run (string[] args)
+        private void Run(string[] args)
         {
             // DPI Awareness API is not available on older OS's, but they work in
             // physical pixels anyway, so we just ignore if the call fails.
             try
             {
-                NativeMethods.SetProcessDpiAwareness (NativeMethods.PROCESS_DPI_AWARENESS.Process_Per_Monitor_DPI_Aware);
+                NativeMethods.SetProcessDpiAwareness(NativeMethods.ProcessDpiAwareness.ProcessPerMonitorDpiAware);
             }
             catch (DllNotFoundException)
             {
-                Debug.WriteLine ("No SHCore.DLL. No problem.");
+                Debug.WriteLine("No SHCore.DLL. No problem.");
             }
 
             // Parse command line arguments
-            foreach (string arg in args)
+            foreach (var arg in args)
             {
                 switch (arg)
                 {
@@ -210,7 +211,7 @@ namespace MouseUnSnag
                         IsScreenWrapEnabled = true;
                         break;
                     default:
-                        string exeName = Environment.GetCommandLineArgs()[0];
+                        var exeName = Environment.GetCommandLineArgs()[0];
                         Console.WriteLine($"Usage: {exeName} [options ...]");
                         Console.WriteLine("\t-s    Disables mouse un-sticking.");
                         Console.WriteLine("\t+s    Enables mouse un-sticking. Default.");
@@ -223,32 +224,32 @@ namespace MouseUnSnag
                 }
             }
 
-            SnagScreen.Init (Screen.AllScreens);
+            SnagScreen.Init(Screen.AllScreens);
 
-            Debug.WriteLine (SnagScreen.GetScreenInformation());
+            Debug.WriteLine(SnagScreen.GetScreenInformation());
 
             // Get notified of any screen configuration changes.
             SystemEvents.DisplaySettingsChanged += Event_DisplaySettingsChanged;
 
             // Keep a reference to the delegate, so it does not get garbage collected.
-            MouseHookDelegate = LLMouseHookCallback;
-            LLMouse_hookhand = SetHook (NativeMethods.WH_MOUSE_LL, MouseHookDelegate);
+            _mouseHookDelegate = LlMouseHookCallback;
+            _llMouseHookhand = SetHook(NativeMethods.WhMouseLl, _mouseHookDelegate);
 
             // This is the one that runs "forever" while the application is alive, and handles
             // events, etc. This application is ABSOLUTELY ENTIRELY driven by the LLMouseHook
             // and DisplaySettingsChanged events.
-            Application.Run (new MyCustomApplicationContext(this));
+            Application.Run(new MyCustomApplicationContext(this));
 
-            Debug.WriteLine ("Exiting!!!");
-            UnsetHook (ref LLMouse_hookhand);
+            Debug.WriteLine("Exiting!!!");
+            UnsetHook(ref _llMouseHookhand);
             SystemEvents.DisplaySettingsChanged -= Event_DisplaySettingsChanged;
         }
 
         [STAThread]
-        public static void Main (string[] args)
+        public static void Main(string[] args)
         {
             // Make sure the MouseUnSnag.exe has only one instance running at a time.
-            using (new Mutex(initiallyOwned: true, "__MouseUnSnag_EXE__", out bool createdNew))
+            using (new Mutex(initiallyOwned: true, "__MouseUnSnag_EXE__", out var createdNew))
             {
                 if (!createdNew)
                 {
