@@ -21,15 +21,15 @@ namespace MouseUnSnag
 
     public class SnagScreen
     {
-        public static SnagScreen[] All { get; private set; }
-        public static List<SnagScreen> LeftMost { get; private set; }
-        public static List<SnagScreen> RightMost { get; private set; }
-        public static List<SnagScreen> TopMost { get; private set; }
-        public static List<SnagScreen> BottomMost { get; private set; }
-        public static Rectangle BoundingBox { get; private set; }
+        private static SnagScreen[] All { get; set; }
+        private static List<SnagScreen> LeftMost { get; set; }
+        private static List<SnagScreen> RightMost { get; set; }
+        private static List<SnagScreen> TopMost { get; set; }
+        private static List<SnagScreen> BottomMost { get; set; }
+        private static Rectangle BoundingBox { get; set; }
 
-        public Screen Screen { get; } // Points to the entry in Screen.AllScreens[].
-        public int Num { get; }
+        private Screen Screen { get; } // Points to the entry in Screen.AllScreens[].
+        private int Num { get; }
         public Rectangle R => Screen.Bounds; // Shortcut to screen.Bounds.
         public override string ToString() => Num.ToString(CultureInfo.InvariantCulture);
 
@@ -52,10 +52,10 @@ namespace MouseUnSnag
             Below = new List<SnagScreen>();
         }
 
-        public bool IsLeftmost => ToLeft.Count == 0;
-        public bool IsRightmost => ToRight.Count == 0;
-        public bool IsTopmost => Above.Count == 0;
-        public bool IsBottommost => Below.Count == 0;
+        private bool IsLeftmost => ToLeft.Count == 0;
+        private bool IsRightmost => ToRight.Count == 0;
+        private bool IsTopmost => Above.Count == 0;
+        private bool IsBottommost => Below.Count == 0;
 
         // If s is immediately adjacent to (shares a border with) us, then add it to the
         // appropriate direction list. If s is not "touching" us, then it will not get added to
@@ -142,8 +142,13 @@ namespace MouseUnSnag
             return All.FirstOrDefault(s => s.R.Contains(P));
         }
 
-        // Find the first monitor (first one we come across in the for() loop)
-        // that is in the direction of the point.
+        /// <summary>
+        /// Find the first monitor (first one we come across in the for() loop)
+        /// that is in the direction of the point.
+        /// </summary>
+        /// <param name="Dir">Direction</param>
+        /// <param name="CurScreen">Current Screen</param>
+        /// <returns></returns>
         public static SnagScreen ScreenInDirection(Point Dir, Rectangle CurScreen)
         {
             // Screen must be strictly above/below/beside. For instance, for a monitor to be
@@ -155,20 +160,17 @@ namespace MouseUnSnag
                     ((Dir.X == -1) && (CurScreen.Left == s.R.Right)) ||
                     ((Dir.Y == 1) && (CurScreen.Bottom == s.R.Top)) ||
                     ((Dir.Y == -1) && (CurScreen.Top == s.R.Bottom)))
-
+                {
                     return s;
+                }
             }
             return null;
+
+            // May want to update the above routine, which arbitrarily selects the monitor that
+            // happens to come first in the for() loop. We should probably do a little extra work,
+            // and select the monitor that is closest to the mouse position.
         }
 
-        // May want to update the above routine, which arbitrarily selects the monitor that
-        // happens to come first in the for() loop. We should probably do a little extra work,
-        // and select the monitor that is closest to the mouse position.
-
-        // Find the monitor that is closest to the point.
-        //public static SnagScreen ScreenInDirection()
-        //{
-        //}
 
         // Find the best screen to "wrap" around the cursor, either horizontally or
         // vertically. We consider only the "OuterMost" screens. For instance, if
@@ -176,29 +178,23 @@ namespace MouseUnSnag
         // RightMost[] array.
         public static SnagScreen WrapScreen(Point Dir, Point Cursor)
         {
-            var distClosest = int.MaxValue;
-            SnagScreen ws = null; // Our "wrap screen".
-
             if (Dir.X == 0)
-            {
                 return All[0];
-            }
 
             // Find closest Left- or Right-most screen, in Y direction.
-            foreach (var s in (Dir.X == 1 ? LeftMost : RightMost))
+            var distClosest = int.MaxValue;
+            var screensToCheck = (Dir.X == 1 ? LeftMost : RightMost);
+            var ws = screensToCheck.FirstOrDefault() ?? All[0]; 
+            foreach (var s in screensToCheck)
             {
                 var dist = Math.Abs(GeometryUtil.OutsideYDistance(s.R, Cursor));
                 if (dist >= distClosest)
-                {
                     continue;
-                }
 
                 distClosest = dist;
                 ws = s;
             }
             return ws;
-
-            // We should never get here, but if we do, just return the first screen.
         }
     }
 }
