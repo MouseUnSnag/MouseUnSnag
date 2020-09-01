@@ -79,6 +79,7 @@
   <ItemGroup>
     <None Include="LICENSE" />
     <None Include="README.md" />
+    <None Include="version.json" />
   </ItemGroup>
   <ItemGroup>
     <Content Include=".gitignore" />
