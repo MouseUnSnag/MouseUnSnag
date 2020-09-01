@@ -11,12 +11,18 @@ namespace MouseUnSnag
 {
     internal class MouseHookHandler
     {
+        private int _nJumps;
+        private volatile bool _updatingDisplaySettings;
+
+        // Need to explicitly keep a reference to this, so it does not get "garbage collected."
+        private NativeMethods.HookProc _mouseHookDelegate;
+
         private IntPtr _llMouseHookhand = IntPtr.Zero;
         private Point _lastMouse = new Point(0, 0);
-        private int _nJumps;
-
-        private HookHandler _hookHandler;
         
+        private HookHandler _hookHandler;
+
+        private Rectangle _lastScreenRect = Rectangle.Empty;
 
         /// <summary>
         /// Command Line Options
@@ -31,8 +37,7 @@ namespace MouseUnSnag
 
         public void Run()
         {
-            SnagScreen.Init(Screen.AllScreens);
-            Debug.WriteLine(SnagScreen.GetScreenInformation());
+            UpdateScreens();
 
             // Get notified of any screen configuration changes.
             SystemEvents.DisplaySettingsChanged += Event_DisplaySettingsChanged;
@@ -42,15 +47,8 @@ namespace MouseUnSnag
             _hookHandler = new HookHandler();
             _llMouseHookhand = _hookHandler.SetHook(NativeMethods.WhMouseLl, _mouseHookDelegate);
 
-            
             using (var ctx = new MyCustomApplicationContext(Options))
-            {
-                // This is the one that runs "forever" while the application is alive, and handles
-                // events, etc. This application is ABSOLUTELY ENTIRELY driven by the LLMouseHook
-                // and DisplaySettingsChanged events.
                 Application.Run(ctx);
-            }
-            
 
             Debug.WriteLine("Exiting...");
             HookHandler.UnsetHook(ref _llMouseHookhand);
@@ -72,10 +70,10 @@ namespace MouseUnSnag
         {
             if ((nCode == 0) && (wParam == NativeMethods.WmMousemove) && !_updatingDisplaySettings)
             {
-                var hookStruct = (NativeMethods.Msllhookstruct)Marshal.PtrToStructure(lParam, typeof(NativeMethods.Msllhookstruct));
+                var hookStruct = (NativeMethods.Msllhookstruct) Marshal.PtrToStructure(lParam, typeof(NativeMethods.Msllhookstruct));
                 var mouse = hookStruct.pt;
 
-                if (NativeMethods.GetCursorPos(out var cursor) && CheckJumpCursor(mouse, cursor, out var newCursor))
+                if (NativeMethods.GetCursorPos(out var cursor) && !_lastScreenRect.Contains(mouse) && CheckJumpCursor(mouse, cursor, out var newCursor))
                 {
                     NativeMethods.SetCursorPos(newCursor);
                     return (IntPtr) 1;
@@ -110,6 +108,7 @@ namespace MouseUnSnag
             newCursor = cursor; // Default is to not move cursor.
 
             // Gather pertinent information about cursor, mouse, screens.
+            
             var lastScreen = SnagScreen.WhichScreen(_lastMouse);
             var cursorScreen = SnagScreen.WhichScreen(cursor);
             var mouseScreen = SnagScreen.WhichScreen(mouse);
@@ -120,6 +119,7 @@ namespace MouseUnSnag
                              $"cur_mouse:{mouse}  prev_mouse:{_lastMouse} ==? cursor:{cursor} (OnMon#{cursorScreen}/{mouseScreen})  " +
                              $"#UnSnags {_nJumps}   {(isStuck ? "--STUCK--" : "         ")}   ");
 
+            _lastScreenRect = cursorScreen.R;
             _lastMouse = mouse;
 
             // Let caller know we did NOT jump the cursor.
@@ -181,17 +181,18 @@ namespace MouseUnSnag
 
         
 
-        // Need to explicitly keep a reference to this, so it does not get "garbage collected."
-        private NativeMethods.HookProc _mouseHookDelegate;
-
-        
-        private volatile bool _updatingDisplaySettings;
         private void Event_DisplaySettingsChanged(object sender, EventArgs e)
+        {
+            UpdateScreens();
+        }
+
+        private void UpdateScreens()
         {
             _updatingDisplaySettings = true;
             Debug.WriteLine("\nDisplay Settings Changed...");
             SnagScreen.Init(Screen.AllScreens);
             Debug.WriteLine(SnagScreen.GetScreenInformation());
+            _lastScreenRect = Rectangle.Empty;
             _updatingDisplaySettings = false;
         }
     }

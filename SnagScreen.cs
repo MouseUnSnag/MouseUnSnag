@@ -70,9 +70,12 @@ namespace MouseUnSnag
         }
 
         // Loop through Screen.AllScreens[] array to initialize ourselves.
-        public static void Init(Screen[] AllScreens)
+        public static void Init(Screen[] allScreens)
         {
-            var n = AllScreens.Length;
+            if (allScreens == null)
+                throw new ArgumentNullException(nameof(allScreens));
+
+            var n = allScreens.Length;
             TopMost = new List<SnagScreen>();
             BottomMost = new List<SnagScreen>();
             LeftMost = new List<SnagScreen>();
