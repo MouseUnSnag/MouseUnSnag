@@ -21,31 +21,50 @@ namespace MouseUnSnag
 
     public class SnagScreen
     {
+        /// <summary> List of All Screens </summary>
         private static SnagScreen[] All { get; set; }
+        /// <summary> List of Screens that are considered left most </summary>
         private static List<SnagScreen> LeftMost { get; set; }
+        /// <summary> List of Screens that are considered right most </summary>
         private static List<SnagScreen> RightMost { get; set; }
+        /// <summary> List of Screens that are considered top most </summary>
         private static List<SnagScreen> TopMost { get; set; }
+        /// <summary> List of Screens that are considered bottom most </summary>
         private static List<SnagScreen> BottomMost { get; set; }
+        /// <summary> Bounding box that encompasses all screens </summary>
         private static Rectangle BoundingBox { get; set; }
 
+        /// <summary> The associated <see cref="Screen"/> </summary>
         private Screen Screen { get; } // Points to the entry in Screen.AllScreens[].
-        private int Num { get; }
-        public Rectangle R => Screen.Bounds; // Shortcut to screen.Bounds.
-        public override string ToString() => Num.ToString(CultureInfo.InvariantCulture);
-
+        /// <summary> Screen Number </summary>
+        private int ScreenNumber { get; }
+        /// <summary> Shortcut to screen.Bounds </summary>
+        public Rectangle R => Screen.Bounds;
+        /// <summary> Effective DPI </summary>
         public int EffectiveDpi { get; }
 
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString() => ScreenNumber.ToString(CultureInfo.InvariantCulture);
+
+        /// <summary> List of Screens that are to the left </summary>
         public List<SnagScreen> ToLeft { get; }
+        /// <summary> List of Screens that are to the right </summary>
         public List<SnagScreen> ToRight { get; }
+        /// <summary> List of Screens that are above </summary>
         public List<SnagScreen> Above { get; }
+        /// <summary> List of Screens that are below </summary>
         public List<SnagScreen> Below { get; }
 
-        // Initialize each SnagScreen from each member of Screen.AllScreens[] array.
+        /// <summary>
+        /// Initialize a new <see cref="SnagScreen"/>
+        /// </summary>
+        /// <param name="S"><see cref="Screen"/></param>
+        /// <param name="ScreenNum">Screen Number</param>
         public SnagScreen(Screen S, int ScreenNum)
         {
             EffectiveDpi = (int)NativeMethods.GetDpi(S, NativeMethods.DpiType.Effective);
             Screen = S;
-            Num = ScreenNum;
+            ScreenNumber = ScreenNum;
             ToLeft = new List<SnagScreen>();
             ToRight = new List<SnagScreen>();
             Above = new List<SnagScreen>();
@@ -61,7 +80,7 @@ namespace MouseUnSnag
         // appropriate direction list. If s is not "touching" us, then it will not get added to
         // any list. s can be added to at most one list (hence use of "else if" instead of just
         // a sequence of "if's").
-        public void AddDirectionTo(SnagScreen s)
+        private void AddDirectionTo(SnagScreen s)
         {
             if ((R.Right == s.R.Left) && GeometryUtil.OverlapY(R, s.R)) ToRight.Add(s);
             else if ((R.Left == s.R.Right) && GeometryUtil.OverlapY(R, s.R)) ToLeft.Add(s);
@@ -109,6 +128,10 @@ namespace MouseUnSnag
             }
         }
 
+        /// <summary>
+        /// Get Screen Information as Text
+        /// </summary>
+        /// <returns></returns>
         public static string GetScreenInformation()
         {
             var sb = new StringBuilder();
@@ -136,10 +159,15 @@ namespace MouseUnSnag
 
             return sb.ToString();
 
-            string AsString(List<SnagScreen> L) => string.Join(",", L.Select(sn => sn.Num));
+            string AsString(List<SnagScreen> L) => string.Join(",", L.Select(sn => sn.ScreenNumber));
         }
 
         // Find which screen the point is on. If it is not on one, return null.
+        /// <summary>
+        /// Find which screen the point is on. Returns null if not on any screen
+        /// </summary>
+        /// <param name="P">Point to check</param>
+        /// <returns>Screen on which the point is, or null otherwise</returns>
         public static SnagScreen WhichScreen(Point P)
         {
             return All.FirstOrDefault(s => s.R.Contains(P));
@@ -175,10 +203,15 @@ namespace MouseUnSnag
         }
 
 
-        // Find the best screen to "wrap" around the cursor, either horizontally or
-        // vertically. We consider only the "OuterMost" screens. For instance, if
-        // the mouse is moving to the left, we consider only the screens in the
-        // RightMost[] array.
+        /// <summary>
+        /// Find the best screen to "wrap" around the cursor, either horizontally or
+        /// vertically. We consider only the "OuterMost" screens. For instance, if
+        /// the mouse is moving to the left, we consider only the screens in the
+        /// RightMost[] array.
+        /// </summary>
+        /// <param name="Dir">Point that represents the direction</param>
+        /// <param name="Cursor">Point that represents the cursor</param>
+        /// <returns></returns>
         public static SnagScreen WrapScreen(Point Dir, Point Cursor)
         {
             if (Dir.X == 0)
