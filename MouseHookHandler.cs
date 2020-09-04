@@ -11,6 +11,7 @@ namespace MouseUnSnag
 {
     internal class MouseHookHandler
     {
+        private int _nEvaluationCount;
         private int _nJumps;
         private volatile bool _updatingDisplaySettings;
 
@@ -115,9 +116,12 @@ namespace MouseUnSnag
             var isStuck = (cursor != _lastMouse) && (mouseScreen != cursorScreen) || (mouseScreen != lastScreen);
             var stuckDirection = GeometryUtil.OutsideDirection(cursorScreen.R, mouse);
 
-            Debug.WriteLine($" StuckDirection/Distance{stuckDirection}/{GeometryUtil.OutsideDistance(cursorScreen.R, mouse)} " +
+            
+            Debug.WriteLine($"{_nEvaluationCount} StuckDirection/Distance{stuckDirection}/{GeometryUtil.OutsideDistance(cursorScreen.R, mouse)} " +
                              $"cur_mouse:{mouse}  prev_mouse:{_lastMouse} ==? cursor:{cursor} (OnMon#{cursorScreen}/{mouseScreen})  " +
                              $"#UnSnags {_nJumps}   {(isStuck ? "--STUCK--" : "         ")}   ");
+
+            _nEvaluationCount += 1;
 
             _lastScreenRect = cursorScreen.R;
             _lastMouse = mouse;
@@ -133,14 +137,16 @@ namespace MouseUnSnag
             // bounds, so just jump to it!
             if (mouseScreen != null)
             {
+                Debug.WriteLine("MouseScreen");
+
                 if (!Options.Unstick)
                     return false;
 
-                if (lastScreen != mouseScreen && lastScreen != null)
+                if (true)
                 {
                     var nc = mouse;
-                    nc.Y = nc.Y * mouseScreen.EffectiveDpi / lastScreen.EffectiveDpi;
-                    Debug.WriteLine($"R: {nc}, {lastScreen.EffectiveDpi}>{mouseScreen.EffectiveDpi}");
+                    nc.Y = nc.Y * mouseScreen.R.Height / cursorScreen.R.Height;
+                    Debug.WriteLine($"R: {nc}, {mouseScreen.R.Height}>{cursorScreen.R.Height}");
                     newCursor = nc;
                 }
                 else
@@ -150,12 +156,17 @@ namespace MouseUnSnag
             }
             else if (jumpScreen != null)
             {
+                Debug.WriteLine("JumpScreen");
                 if (!Options.Jump)
                     return false;
-                newCursor = jumpScreen.R.ClosestBoundaryPoint(cursor);
+                var c = cursor;
+                c.Y = c.Y * jumpScreen.R.Height / cursorScreen.R.Height;
+
+                newCursor = jumpScreen.R.ClosestBoundaryPoint(c);
             }
             else if (stuckDirection.X != 0)
             {
+                Debug.WriteLine("Wrap");
                 if (!Options.Wrap)
                     return false;
 
@@ -171,6 +182,7 @@ namespace MouseUnSnag
             }
             else
             {
+                Debug.WriteLine("Nope");
                 return false;
             }
 
