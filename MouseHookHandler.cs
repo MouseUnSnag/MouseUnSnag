@@ -209,7 +209,7 @@ namespace MouseUnSnag
             var displays = new DisplayList(Screen.AllScreens);
             Debug.WriteLine(displays.GetScreenInformation());
             _lastScreenRect = Rectangle.Empty;
-            _displays = displays;
+            _displays = displays; // FIXME: this is not really threadsafe. 
             _updatingDisplaySettings = false;
         }
     }
