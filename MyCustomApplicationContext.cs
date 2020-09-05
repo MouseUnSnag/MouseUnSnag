@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using MouseUnSnag.CommandLine;
-using MouseUnSnag.Properties;
 
 namespace MouseUnSnag
 {
@@ -25,7 +24,7 @@ namespace MouseUnSnag
         {
             _trayIcon = new NotifyIcon
             {
-                Icon = Resources.Icon,
+                Icon = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath),
                 ContextMenu = new ContextMenu(MakeMenuItems(options).ToArray()),
                 Visible = true
             };
