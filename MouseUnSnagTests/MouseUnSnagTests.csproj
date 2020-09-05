@@ -49,6 +49,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="CommandLine\OptionsTests.cs" />
     <Compile Include="GeometryUtilTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScreenHandling\DisplayTests.cs" />
