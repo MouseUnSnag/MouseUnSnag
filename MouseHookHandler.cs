@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
@@ -118,23 +119,23 @@ namespace MouseUnSnag
             var cursorScreen = _displays.WhichScreen(cursor);
             var mouseScreen = _displays.WhichScreen(mouse);
             var isStuck = (cursor != _lastMouse) && (mouseScreen != cursorScreen) || (mouseScreen != lastScreen);
-            var stuckDirection = GeometryUtil.OutsideDirection(cursorScreen.R, mouse);
+            var stuckDirection = GeometryUtil.OutsideDirection(cursorScreen.Bounds, mouse);
 
             
-            Debug.WriteLine($"{_nEvaluationCount} StuckDirection/Distance{stuckDirection}/{GeometryUtil.OutsideDistance(cursorScreen.R, mouse)} " +
+            Debug.WriteLine($"{_nEvaluationCount} StuckDirection/Distance{stuckDirection}/{GeometryUtil.OutsideDistance(cursorScreen.Bounds, mouse)} " +
                              $"cur_mouse:{mouse}  prev_mouse:{_lastMouse} ==? cursor:{cursor} (OnMon#{cursorScreen}/{mouseScreen})  " +
                              $"#UnSnags {_nJumps}   {(isStuck ? "--STUCK--" : "         ")}   ");
 
             _nEvaluationCount += 1;
 
-            _lastScreenRect = cursorScreen.R;
+            _lastScreenRect = cursorScreen.Bounds;
             _lastMouse = mouse;
 
             // Let caller know we did NOT jump the cursor.
             if (!isStuck)
                 return false;
 
-            var jumpScreen = _displays.ScreenInDirection(stuckDirection, cursorScreen.R);
+            var jumpScreen = _displays.ScreenInDirection(stuckDirection, cursorScreen.Bounds);
 
             // If the mouse "location" (which can take on a value beyond the current
             // cursor screen) has a value, then it is "within" another valid screen
@@ -149,8 +150,8 @@ namespace MouseUnSnag
                 if (true)
                 {
                     var nc = mouse;
-                    nc.Y = nc.Y * mouseScreen.R.Height / cursorScreen.R.Height;
-                    Debug.WriteLine($"R: {nc}, {mouseScreen.R.Height}>{cursorScreen.R.Height}");
+                    nc.Y = nc.Y * mouseScreen.Bounds.Height / cursorScreen.Bounds.Height;
+                    Debug.WriteLine($"R: {nc}, {mouseScreen.Bounds.Height}>{cursorScreen.Bounds.Height}");
                     newCursor = nc;
                 }
                 else
@@ -164,9 +165,9 @@ namespace MouseUnSnag
                 if (!Options.Jump)
                     return false;
                 var c = cursor;
-                c.Y = c.Y * jumpScreen.R.Height / cursorScreen.R.Height;
+                c.Y = c.Y * jumpScreen.Bounds.Height / cursorScreen.Bounds.Height;
 
-                newCursor = jumpScreen.R.ClosestBoundaryPoint(c);
+                newCursor = jumpScreen.Bounds.ClosestBoundaryPoint(c);
             }
             else if (stuckDirection.X != 0)
             {
@@ -176,13 +177,13 @@ namespace MouseUnSnag
 
                 var wrapScreen = _displays.WrapScreen(stuckDirection, cursor);
                 var wrapPoint = new Point(
-                    stuckDirection.X == 1 ? wrapScreen.R.Left : wrapScreen.R.Right - 1, cursor.Y);
+                    stuckDirection.X == 1 ? wrapScreen.Bounds.Left : wrapScreen.Bounds.Right - 1, cursor.Y);
 
                 // Don't wrap cursor if jumping is disabled and it would need to jump.
-                if (!Options.Jump && !wrapScreen.R.Contains(wrapPoint))
+                if (!Options.Jump && !wrapScreen.Bounds.Contains(wrapPoint))
                     return false;
 
-                newCursor = wrapScreen.R.ClosestBoundaryPoint(wrapPoint);
+                newCursor = wrapScreen.Bounds.ClosestBoundaryPoint(wrapPoint);
             }
             else
             {
@@ -206,7 +207,7 @@ namespace MouseUnSnag
         {
             _updatingDisplaySettings = true;
             Debug.WriteLine("\nDisplay Settings Changed...");
-            var displays = new DisplayList(Screen.AllScreens);
+            var displays = new DisplayList(Screen.AllScreens.Select(x => (ScreenWrapper) x));
             Debug.WriteLine(displays.GetScreenInformation());
             _lastScreenRect = Rectangle.Empty;
             _displays = displays; // FIXME: this is not really threadsafe. 

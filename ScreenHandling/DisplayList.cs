@@ -8,44 +8,53 @@ using System.Windows.Forms;
 
 namespace MouseUnSnag.ScreenHandling
 {
+
+    /// <summary>
+    /// Wraps a List of Displays and provides useful methods
+    /// </summary>
     public class DisplayList
     {
         /// <summary> List of All Screens </summary>
-        public List<SnagScreen> All { get; }
+        public List<Display> All { get; }
 
         /// <summary> List of Screens that are considered left most </summary>
-        public List<SnagScreen> LeftMost { get; }
+        public List<Display> LeftMost { get; }
         /// <summary> List of Screens that are considered right most </summary>
-        public List<SnagScreen> RightMost { get; }
+        public List<Display> RightMost { get; }
         /// <summary> List of Screens that are considered top most </summary>
-        public List<SnagScreen> TopMost { get; }
+        public List<Display> TopMost { get; }
         /// <summary> List of Screens that are considered bottom most </summary>
-        public List<SnagScreen> BottomMost { get; }
+        public List<Display> BottomMost { get; }
 
         /// <summary> Bounding box that encompasses all screens </summary>
         public Rectangle BoundingBox { get; }
 
-        public DisplayList(IEnumerable<Screen> screens)
+        /// <summary>
+        /// Initializes a new <see cref="DisplayList"/>
+        /// </summary>
+        /// <param name="screens"></param>
+        /// <exception cref="NullReferenceException">screens was null</exception>
+        public DisplayList(IEnumerable<IScreen> screens)
         {
             if (screens == null)
                 throw new ArgumentNullException(nameof(screens));
 
             var boundingBox = Rectangle.Empty;
-            var snagScreens = screens.Select((x, i) => new SnagScreen(x, i)).ToList();
-            foreach (var snagScreen in snagScreens)
+            var displays = screens.Select((x, i) => new Display(x, i)).ToList();
+            foreach (var display in displays)
             {
-                foreach (var s in snagScreens) 
-                    snagScreen.AddDirectionTo(s);
+                foreach (var s in displays) 
+                    display.Link(s);
 
-                boundingBox = Rectangle.Union(boundingBox, snagScreen.R);
+                boundingBox = Rectangle.Union(boundingBox, display.Bounds);
             }
 
-            All = snagScreens;
+            All = displays;
             BoundingBox = boundingBox;
-            LeftMost = snagScreens.Where(x => x.ToLeft.Count == 0).ToList();
-            RightMost = snagScreens.Where(x => x.ToRight.Count == 0).ToList();
-            TopMost = snagScreens.Where(x => x.Above.Count == 0).ToList();
-            BottomMost = snagScreens.Where(x => x.Below.Count == 0).ToList();
+            LeftMost = displays.Where(x => x.ToLeft.Count == 0).ToList();
+            RightMost = displays.Where(x => x.ToRight.Count == 0).ToList();
+            TopMost = displays.Where(x => x.Above.Count == 0).ToList();
+            BottomMost = displays.Where(x => x.Below.Count == 0).ToList();
 
         }
 
@@ -54,9 +63,9 @@ namespace MouseUnSnag.ScreenHandling
         /// </summary>
         /// <param name="P">Point to check</param>
         /// <returns>Screen on which the point is, or null otherwise</returns>
-        public SnagScreen WhichScreen(Point P)
+        public Display WhichScreen(Point P)
         {
-            return All.FirstOrDefault(s => s.R.Contains(P));
+            return All.FirstOrDefault(s => s.Bounds.Contains(P));
         }
 
         /// <summary>
@@ -66,17 +75,17 @@ namespace MouseUnSnag.ScreenHandling
         /// <param name="dir">Direction</param>
         /// <param name="curScreen">Current Screen</param>
         /// <returns></returns>
-        public SnagScreen ScreenInDirection(Point dir, Rectangle curScreen)
+        public Display ScreenInDirection(Point dir, Rectangle curScreen)
         {
             // Screen must be strictly above/below/beside. For instance, for a monitor to be
             // "above", the monitor's Bottom equal to the current screen's Top ("current
             // screen" is where the Cursor (NOT the mouse!!) is currently).
             foreach (var s in All)
             {
-                if (((dir.X == 1) && (curScreen.Right == s.R.Left)) ||
-                    ((dir.X == -1) && (curScreen.Left == s.R.Right)) ||
-                    ((dir.Y == 1) && (curScreen.Bottom == s.R.Top)) ||
-                    ((dir.Y == -1) && (curScreen.Top == s.R.Bottom)))
+                if (((dir.X == 1) && (curScreen.Right == s.Bounds.Left)) ||
+                    ((dir.X == -1) && (curScreen.Left == s.Bounds.Right)) ||
+                    ((dir.Y == 1) && (curScreen.Bottom == s.Bounds.Top)) ||
+                    ((dir.Y == -1) && (curScreen.Top == s.Bounds.Bottom)))
                 {
                     return s;
                 }
@@ -98,7 +107,7 @@ namespace MouseUnSnag.ScreenHandling
         /// <param name="dir">Point that represents the direction</param>
         /// <param name="cursor">Point that represents the cursor</param>
         /// <returns></returns>
-        public SnagScreen WrapScreen(Point dir, Point cursor)
+        public Display WrapScreen(Point dir, Point cursor)
         {
             if (dir.X == 0)
                 return All[0];
@@ -109,7 +118,7 @@ namespace MouseUnSnag.ScreenHandling
             var ws = screensToCheck.FirstOrDefault() ?? All[0]; 
             foreach (var s in screensToCheck)
             {
-                var dist = Math.Abs(GeometryUtil.OutsideYDistance(s.R, cursor));
+                var dist = Math.Abs(GeometryUtil.OutsideYDistance(s.Bounds, cursor));
                 if (dist >= distClosest)
                     continue;
 
@@ -129,29 +138,21 @@ namespace MouseUnSnag.ScreenHandling
             var sb = new StringBuilder();
             var n = All.Count;
             sb.AppendLine($"There {((n > 1) ? "are" : "is")} {n} SCREEN{((n > 1) ? "S" : "")}:");
+            
             var i = 0;
-
             foreach (var s in All)
             {
-                var dpiEffective = NativeMethods.GetDpi(s.Screen, NativeMethods.DpiType.Effective);
-                var r = s.R;
-
-                sb.AppendLine(
-                    $"   {i}: ({r.Left},{r.Top})-({r.Right},{r.Bottom})   Size:({r.Width},{r.Height}) " +
-                    $"L({AsString(s.ToLeft)}),R({AsString(s.ToRight)}),A({AsString(s.Above)}),B({AsString(s.Below)})    " +
-                    $"DPI(Raw/Eff/Ang): {NativeMethods.GetDpi(s.Screen, NativeMethods.DpiType.Raw)}/{dpiEffective}/{NativeMethods.GetDpi(s.Screen, NativeMethods.DpiType.Angular)}  " +
-                    $"Screen Scaling: {Math.Round(dpiEffective / 96.0 * 100)}%   \r"); //  {S.DeviceName}     \r");
-                ++i;
+                sb.AppendLine($"    {i}: {s.DetailledDescription()}");
+                i += 1;
             }
 
             sb.AppendLine(
-                $"Rtmost({AsString(RightMost)}), Lfmost({AsString(LeftMost)}), " +
-                $"Topmost({AsString(TopMost)}), Btmost({AsString(BottomMost)})   " +
+                $"Screens at the Edge: R({AsString(RightMost)}), L({AsString(LeftMost)}), T({AsString(TopMost)}), B({AsString(BottomMost)})   " +
                 $"BoundingBox{BoundingBox}");
 
             return sb.ToString();
 
-            string AsString(List<SnagScreen> L) => string.Join(",", L.Select(sn => sn.ScreenNumber));
+            static string AsString(List<Display> L) => string.Join(",", L.Select(sn => sn.ScreenNumber));
         }
 
     }

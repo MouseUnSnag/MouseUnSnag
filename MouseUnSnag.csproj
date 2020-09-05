@@ -78,7 +78,6 @@
     <Compile Include="ScreenHandling\IScreen.cs" />
     <Compile Include="ScreenHandling\ScreenWrapper.cs" />
     <Compile Include="ScreenHandling\VirtualScreen.cs" />
-    <Compile Include="SnagScreen.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="LICENSE" />
