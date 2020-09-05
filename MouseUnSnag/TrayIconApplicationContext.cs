@@ -67,7 +67,7 @@ namespace MouseUnSnag
                 new MenuItem("Rescale Pointer between Screens", (sender, _) =>
                 {
                     var item = (MenuItem) sender;
-                    options.Wrap = !options.Rescale;
+                    options.Rescale = !options.Rescale;
                     item.Checked = options.Rescale;
                 })
                 {
