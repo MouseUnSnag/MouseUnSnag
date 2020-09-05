@@ -32,6 +32,7 @@ namespace MouseUnSnag
 
         private IEnumerable<MenuItem> MakeMenuItems(Options options)
         {
+
             return new[]
             {
                 new MenuItem("UnStick from corners", (sender, _) =>
@@ -62,6 +63,15 @@ namespace MouseUnSnag
                 })
                 {
                     Checked = options.Wrap
+                },
+                new MenuItem("Rescale Pointer between Screens", (sender, _) =>
+                {
+                    var item = (MenuItem) sender;
+                    options.Wrap = !options.Rescale;
+                    item.Checked = options.Rescale;
+                })
+                {
+                    Checked = options.Rescale
                 },
 
                 new MenuItem("Exit", delegate

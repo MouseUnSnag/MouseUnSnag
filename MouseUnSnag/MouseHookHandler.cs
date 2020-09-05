@@ -146,7 +146,7 @@ namespace MouseUnSnag
                 if (!Options.Unstick)
                     return false;
 
-                if (true)
+                if (Options.Rescale)
                 {
                     // FIXME: This is a hack for mouse scaling of adjacent screens
                     var nc = mouse;
@@ -167,7 +167,8 @@ namespace MouseUnSnag
 
                 // FIXME: This is a hack for mouse scaling of adjacent screens
                 var c = cursor;
-                c.Y = c.Y * jumpScreen.Bounds.Height / cursorScreen.Bounds.Height;
+                if (Options.Rescale)
+                    c.Y = c.Y * jumpScreen.Bounds.Height / cursorScreen.Bounds.Height;
 
                 newCursor = jumpScreen.Bounds.ClosestBoundaryPoint(c);
             }

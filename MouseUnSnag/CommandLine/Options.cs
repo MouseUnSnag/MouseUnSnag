@@ -7,5 +7,7 @@
         public bool Jump { get; set; } = true;
 
         public bool Wrap { get; set; } = true;
+
+        public bool Rescale { get; set; } = false;
     }
 }

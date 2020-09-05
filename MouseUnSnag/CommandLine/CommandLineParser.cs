@@ -13,33 +13,50 @@ namespace MouseUnSnag.CommandLine
 
             foreach (var arg in args)
             {
-                switch (arg.ToUpperInvariant())
+                var chars = arg.ToCharArray();
+                if (chars.Length != 2)
+                    DisplayUsageAndExit($"Invalid argument: {arg}. ");
+
+                if (!TryDecodeFlag(chars[0], out var flagValue))
+                    DisplayUsageAndExit($"Invalid argument: {arg}. ");
+
+                switch (char.ToUpperInvariant(chars[1]))
                 {
-                    case "-S":
-                        options.Unstick = false;
+                    case 'S':
+                        options.Unstick = flagValue;
                         break;
-                    case "+S":
-                        options.Unstick = true;
+                    case 'J':
+                        options.Jump = flagValue;
                         break;
-                    case "-J":
-                        options.Jump = false;
+                    case 'W':
+                        options.Wrap = flagValue;
                         break;
-                    case "+J":
-                        options.Jump = true;
-                        break;
-                    case "-W":
-                        options.Wrap = false;
-                        break;
-                    case "+W":
-                        options.Wrap = true;
+                    case 'R':
+                        options.Rescale = flagValue;
                         break;
                     default:
                         DisplayUsageAndExit($"Invalid Argument: {arg}");
                         break;
                 }
+
             }
 
             return options;
+        }
+
+        private static bool TryDecodeFlag(char c, out bool result)
+        {
+            result = false;
+            switch (c)
+            {
+                case '+':
+                    result = true;
+                    return true;
+                case '-':
+                    result = false;
+                    return true;
+            }
+            return false;
         }
 
         private static void DisplayUsageAndExit(string prependText = null)
@@ -59,6 +76,8 @@ namespace MouseUnSnag.CommandLine
             lines.Add("\t+j    Enables mouse jumping. Default.");
             lines.Add("\t-w    Disables mouse wrapping.");
             lines.Add("\t+w    Enables mouse wrapping. Default.");
+            lines.Add("\t-r    Disables mouse scaling. Default.");
+            lines.Add("\t+r    Enables mouse scaling. Experimental");
 
 
             // Console.WriteLine(string.Join(Environment.NewLine, lines));
