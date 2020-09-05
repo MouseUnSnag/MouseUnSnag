@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using MouseUnSnag.Configuration;
 
 namespace MouseUnSnag.CommandLine
 {
-    internal class CommandLineParser
+    
+    public class CommandLineParser
     {
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "This is not a high performance Method and we might use member variables in the future")]
-        public Options Decode(IEnumerable<string> args, Options options = null)
+        internal Options Decode(IEnumerable<string> args, Options options = null)
         {
             options ??= new Options();
 

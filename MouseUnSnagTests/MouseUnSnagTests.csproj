@@ -49,6 +49,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="CommandLine\CommandLineParserTests.cs" />
     <Compile Include="Configuration\OptionsHelpers.cs" />
     <Compile Include="Configuration\OptionsTests.cs" />
     <Compile Include="Configuration\OptionsSerializerTests.cs" />
@@ -73,9 +74,7 @@
       <Name>MouseUnSnag</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="CommandLine\" />
-  </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
