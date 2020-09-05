@@ -62,7 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommandLine\CommandLineParser.cs" />
-    <Compile Include="CommandLine\Options.cs" />
+    <Compile Include="Configuration\Options.cs" />
     <Compile Include="Configuration\ConfigWriter.cs" />
     <Compile Include="GeometryUtil.cs" />
     <Compile Include="Hooking\HookHandler.cs" />

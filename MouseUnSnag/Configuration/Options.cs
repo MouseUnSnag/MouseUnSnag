@@ -1,8 +1,6 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
-namespace MouseUnSnag.CommandLine
+namespace MouseUnSnag.Configuration
 {
     public class Options
     {

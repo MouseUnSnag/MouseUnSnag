@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using MouseUnSnag.CommandLine;
+using MouseUnSnag.Configuration;
 using MouseUnSnag.Hooking;
 using MouseUnSnag.ScreenHandling;
 
