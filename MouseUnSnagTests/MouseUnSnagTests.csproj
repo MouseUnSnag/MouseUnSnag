@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="GeometryUtilTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ScreenHandling\DisplayTests.cs" />
     <Compile Include="ScreenHandling\ScreenWrapperTests.cs" />
     <Compile Include="ScreenHandling\VirtualScreenTests.cs" />
   </ItemGroup>
