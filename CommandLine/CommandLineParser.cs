@@ -6,30 +6,31 @@ namespace MouseUnSnag.CommandLine
 {
     internal class CommandLineParser
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "This is not a high performance Method and we might use member variables in the future")]
         public Options Decode(IEnumerable<string> args)
         {
             var options = new Options();
 
             foreach (var arg in args)
             {
-                switch (arg)
+                switch (arg.ToUpperInvariant())
                 {
-                    case "-s":
+                    case "-S":
                         options.Unstick = false;
                         break;
-                    case "+s":
+                    case "+S":
                         options.Unstick = true;
                         break;
-                    case "-j":
+                    case "-J":
                         options.Jump = false;
                         break;
-                    case "+j":
+                    case "+J":
                         options.Jump = true;
                         break;
-                    case "-w":
+                    case "-W":
                         options.Wrap = false;
                         break;
-                    case "+w":
+                    case "+W":
                         options.Wrap = true;
                         break;
                     default:
