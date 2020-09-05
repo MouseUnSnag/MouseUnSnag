@@ -11,7 +11,7 @@ using MouseUnSnag.Properties;
 
 namespace MouseUnSnag
 {
-    internal sealed class MyCustomApplicationContext : ApplicationContext
+    internal sealed class TrayIconApplicationContext : ApplicationContext
     {
         private readonly NotifyIcon _trayIcon;
 
@@ -21,7 +21,7 @@ namespace MouseUnSnag
         /// and DisplaySettingsChanged events.
         /// </summary>
         /// <param name="options"></param>
-        public MyCustomApplicationContext(Options options)
+        public TrayIconApplicationContext(Options options)
         {
             _trayIcon = new NotifyIcon
             {

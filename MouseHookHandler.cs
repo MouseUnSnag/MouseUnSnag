@@ -53,7 +53,7 @@ namespace MouseUnSnag
             _hookHandler = new HookHandler();
             _llMouseHookhand = _hookHandler.SetHook(NativeMethods.WhMouseLl, _mouseHookDelegate);
 
-            using (var ctx = new MyCustomApplicationContext(Options))
+            using (var ctx = new TrayIconApplicationContext(Options))
                 Application.Run(ctx);
 
             Debug.WriteLine("Exiting...");
