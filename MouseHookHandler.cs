@@ -149,6 +149,7 @@ namespace MouseUnSnag
 
                 if (true)
                 {
+                    // FIXME: This is a hack for mouse scaling of adjacent screens
                     var nc = mouse;
                     nc.Y = nc.Y * mouseScreen.Bounds.Height / cursorScreen.Bounds.Height;
                     Debug.WriteLine($"R: {nc}, {mouseScreen.Bounds.Height}>{cursorScreen.Bounds.Height}");
@@ -164,6 +165,8 @@ namespace MouseUnSnag
                 Debug.WriteLine("JumpScreen");
                 if (!Options.Jump)
                     return false;
+
+                // FIXME: This is a hack for mouse scaling of adjacent screens
                 var c = cursor;
                 c.Y = c.Y * jumpScreen.Bounds.Height / cursorScreen.Bounds.Height;
 
