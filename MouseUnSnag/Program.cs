@@ -5,10 +5,13 @@
 
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 using MouseUnSnag.CommandLine;
+using MouseUnSnag.Configuration;
 
 namespace MouseUnSnag
 {
@@ -29,12 +32,48 @@ namespace MouseUnSnag
                 
                 TrySetDpiAwareness();
 
-                var options = new CommandLineParser().Decode(Environment.GetCommandLineArgs().Skip(1));
+                // Load Config from File
+                var optionsFilename = Path.Combine(GetOptionsDirectory(), "snagConfig", "snagConfig.txt");
+                var writer = new OptionsWriter(optionsFilename);
+                var options = writer.TryRead();
+
+                // Override by Command line args
+                options = new CommandLineParser().Decode(Environment.GetCommandLineArgs().Skip(1), options);
+
+                // Write Config if changed
+                options.ConfigChanged += (sender, args) =>
+                {
+                    lock (writer)
+                    {
+                        writer.Write(options);
+                    }
+                };
+
                 var hookHandler = new MouseHookHandler(options);
                 hookHandler.Run();
             }
 
             return 0;
+        }
+
+        private static string GetOptionsDirectory()
+        {
+            try
+            {
+                var assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                if (!string.IsNullOrEmpty(assemblyDir) && Directory.Exists(assemblyDir))
+                    return assemblyDir;
+            }
+            catch (ArgumentException e)
+            {
+                Debug.WriteLine(e);
+            }
+
+            var cliDirName = Environment.GetCommandLineArgs().First();
+            if (!string.IsNullOrEmpty(cliDirName) && Directory.Exists(cliDirName))
+                return cliDirName;
+
+            return Environment.CurrentDirectory;
         }
 
         private static int ShowAlreadyRunningMessageAndQuit()

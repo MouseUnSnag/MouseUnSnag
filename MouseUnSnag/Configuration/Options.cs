@@ -67,5 +67,6 @@ namespace MouseUnSnag.Configuration
             handler?.Invoke(this, EventArgs.Empty);
         }
 
+
     }
 }

@@ -49,7 +49,10 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="CommandLine\OptionsTests.cs" />
+    <Compile Include="Configuration\OptionsHelpers.cs" />
+    <Compile Include="Configuration\OptionsTests.cs" />
+    <Compile Include="Configuration\OptionsSerializerTests.cs" />
+    <Compile Include="Configuration\OptionsWriterTests.cs" />
     <Compile Include="GeometryUtilTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScreenHandling\DisplayTests.cs" />
@@ -69,6 +72,9 @@
       <Project>{62CA82B8-2335-481F-9F3E-50C59C1C02F8}</Project>
       <Name>MouseUnSnag</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="CommandLine\" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

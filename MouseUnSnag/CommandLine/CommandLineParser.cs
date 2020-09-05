@@ -8,9 +8,9 @@ namespace MouseUnSnag.CommandLine
     internal class CommandLineParser
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "This is not a high performance Method and we might use member variables in the future")]
-        public Options Decode(IEnumerable<string> args)
+        public Options Decode(IEnumerable<string> args, Options options = null)
         {
-            var options = new Options();
+            options ??= new Options();
 
             foreach (var arg in args)
             {
@@ -81,6 +81,7 @@ namespace MouseUnSnag.CommandLine
             lines.Add("\t+r    Enables mouse scaling. Experimental");
 
 
+            // FIXME: this is not a great way to handle errors.
             // Console.WriteLine(string.Join(Environment.NewLine, lines));
             MessageBox.Show(string.Join(Environment.NewLine, lines), @"Invalid Argument", MessageBoxButtons.OK);
             Environment.Exit(1);

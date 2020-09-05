@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MouseUnSnag.Configuration;
 
-namespace MouseUnSnag.CommandLine.Tests
+namespace MouseUnSnag.Configuration.Tests
 {
     [TestClass()]
     public class OptionsTests
