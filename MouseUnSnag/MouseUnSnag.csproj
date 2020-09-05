@@ -63,7 +63,6 @@
   <ItemGroup>
     <Compile Include="CommandLine\CommandLineParser.cs" />
     <Compile Include="CommandLine\Options.cs" />
-    <Compile Include="Direction.cs" />
     <Compile Include="GeometryUtil.cs" />
     <Compile Include="Hooking\HookHandler.cs" />
     <Compile Include="MouseHookHandler.cs" />
