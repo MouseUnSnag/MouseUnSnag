@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2046
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30413.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MouseUnSnag", "MouseUnSnag.csproj", "{62CA82B8-2335-481F-9F3E-50C59C1C02F8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MouseUnSnagTests", "..\MouseUnSnagTests\MouseUnSnagTests.csproj", "{2D746C6C-62EB-42BA-9DB6-705119F93718}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{62CA82B8-2335-481F-9F3E-50C59C1C02F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{62CA82B8-2335-481F-9F3E-50C59C1C02F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{62CA82B8-2335-481F-9F3E-50C59C1C02F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D746C6C-62EB-42BA-9DB6-705119F93718}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D746C6C-62EB-42BA-9DB6-705119F93718}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D746C6C-62EB-42BA-9DB6-705119F93718}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D746C6C-62EB-42BA-9DB6-705119F93718}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

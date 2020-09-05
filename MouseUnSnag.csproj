@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="CommandLine\CommandLineParser.cs" />
     <Compile Include="CommandLine\Options.cs" />
+    <Compile Include="Direction.cs" />
     <Compile Include="GeometryUtil.cs" />
     <Compile Include="Hooking\HookHandler.cs" />
     <Compile Include="MouseHookHandler.cs" />
@@ -74,6 +75,9 @@
     </Compile>
     <Compile Include="ScreenHandling\Display.cs" />
     <Compile Include="ScreenHandling\DisplayList.cs" />
+    <Compile Include="ScreenHandling\IScreen.cs" />
+    <Compile Include="ScreenHandling\ScreenWrapper.cs" />
+    <Compile Include="ScreenHandling\VirtualScreen.cs" />
     <Compile Include="SnagScreen.cs" />
   </ItemGroup>
   <ItemGroup>

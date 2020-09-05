@@ -8,8 +8,9 @@ using System.Drawing;
 
 namespace MouseUnSnag
 {
-    internal static class GeometryUtil
+    public static class GeometryUtil
     {
+
         /// <summary>
         /// Return the signs of X and Y. This essentially gives us the "component direction" of
         /// the point (N.B. the vector length is not "normalized" to a length 1 "unit vector" if

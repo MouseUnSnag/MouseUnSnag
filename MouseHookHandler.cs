@@ -2,15 +2,19 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using MouseUnSnag.CommandLine;
 using MouseUnSnag.Hooking;
+using MouseUnSnag.ScreenHandling;
 
 namespace MouseUnSnag
 {
     internal class MouseHookHandler
     {
+        private DisplayList _displays;
+
         private int _nEvaluationCount;
         private int _nJumps;
         private volatile bool _updatingDisplaySettings;
@@ -110,9 +114,9 @@ namespace MouseUnSnag
 
             // Gather pertinent information about cursor, mouse, screens.
             
-            var lastScreen = SnagScreen.WhichScreen(_lastMouse);
-            var cursorScreen = SnagScreen.WhichScreen(cursor);
-            var mouseScreen = SnagScreen.WhichScreen(mouse);
+            var lastScreen = _displays.WhichScreen(_lastMouse);
+            var cursorScreen = _displays.WhichScreen(cursor);
+            var mouseScreen = _displays.WhichScreen(mouse);
             var isStuck = (cursor != _lastMouse) && (mouseScreen != cursorScreen) || (mouseScreen != lastScreen);
             var stuckDirection = GeometryUtil.OutsideDirection(cursorScreen.R, mouse);
 
@@ -130,7 +134,7 @@ namespace MouseUnSnag
             if (!isStuck)
                 return false;
 
-            var jumpScreen = SnagScreen.ScreenInDirection(stuckDirection, cursorScreen.R);
+            var jumpScreen = _displays.ScreenInDirection(stuckDirection, cursorScreen.R);
 
             // If the mouse "location" (which can take on a value beyond the current
             // cursor screen) has a value, then it is "within" another valid screen
@@ -170,7 +174,7 @@ namespace MouseUnSnag
                 if (!Options.Wrap)
                     return false;
 
-                var wrapScreen = SnagScreen.WrapScreen(stuckDirection, cursor);
+                var wrapScreen = _displays.WrapScreen(stuckDirection, cursor);
                 var wrapPoint = new Point(
                     stuckDirection.X == 1 ? wrapScreen.R.Left : wrapScreen.R.Right - 1, cursor.Y);
 
@@ -202,9 +206,10 @@ namespace MouseUnSnag
         {
             _updatingDisplaySettings = true;
             Debug.WriteLine("\nDisplay Settings Changed...");
-            SnagScreen.Init(Screen.AllScreens);
-            Debug.WriteLine(SnagScreen.GetScreenInformation());
+            var displays = new DisplayList(Screen.AllScreens);
+            Debug.WriteLine(displays.GetScreenInformation());
             _lastScreenRect = Rectangle.Empty;
+            _displays = displays;
             _updatingDisplaySettings = false;
         }
     }
