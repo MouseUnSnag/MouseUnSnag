@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30413.136
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MouseUnSnag", "MouseUnSnag.csproj", "{62CA82B8-2335-481F-9F3E-50C59C1C02F8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MouseUnSnag", "MouseUnSnag\MouseUnSnag.csproj", "{62CA82B8-2335-481F-9F3E-50C59C1C02F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MouseUnSnagTests", "..\MouseUnSnagTests\MouseUnSnagTests.csproj", "{2D746C6C-62EB-42BA-9DB6-705119F93718}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MouseUnSnagTests", "MouseUnSnagTests\MouseUnSnagTests.csproj", "{2D746C6C-62EB-42BA-9DB6-705119F93718}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

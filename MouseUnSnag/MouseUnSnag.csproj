@@ -78,12 +78,9 @@
     <Compile Include="ScreenHandling\VirtualScreen.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="LICENSE" />
-    <None Include="README.md" />
     <None Include="version.json" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include=".gitignore" />
     <None Include="mouse.ico" />
   </ItemGroup>
   <ItemGroup>
