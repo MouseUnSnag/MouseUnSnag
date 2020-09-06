@@ -12,6 +12,8 @@ using System.Threading;
 using System.Windows.Forms;
 using MouseUnSnag.CommandLine;
 using MouseUnSnag.Configuration;
+using MouseUnSnag.Win32Interop;
+using MouseUnSnag.Win32Interop.Display;
 
 namespace MouseUnSnag
 {
@@ -29,8 +31,8 @@ namespace MouseUnSnag
             {
                 if (!createdNew)
                     return ShowAlreadyRunningMessageAndQuit();
-                
-                TrySetDpiAwareness();
+
+                Win32Display.SetDpiAwareness(ProcessDpiAwareness.ProcessPerMonitorDpiAware);
 
                 // Load Config from File
                 var optionsFilename = Path.Combine(GetOptionsDirectory(), "snagConfig", "snagConfig.txt");
@@ -80,20 +82,6 @@ namespace MouseUnSnag
         {
             MessageBox.Show(@"MouseUnSnag is already running!! Quitting this instance...", "MouseUnSnag", MessageBoxButtons.OK, MessageBoxIcon.Information);
             return 2;
-        } 
-
-        private static void TrySetDpiAwareness()
-        {
-            try
-            {
-                NativeMethods.SetProcessDpiAwareness(NativeMethods.ProcessDpiAwareness.ProcessPerMonitorDpiAware);
-            }
-            catch (DllNotFoundException)
-            {
-                // DPI Awareness API is not available on older OS's, but they work in
-                // physical pixels anyway, so we just ignore if the call fails.
-                Debug.WriteLine("No SHCore.DLL. No problem.");
-            }
         }
 
 

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using MouseUnSnag.Win32Interop;
+using MouseUnSnag.Win32Interop.Display;
 
 namespace MouseUnSnag.ScreenHandling
 {
@@ -65,9 +67,9 @@ namespace MouseUnSnag.ScreenHandling
             Bounds = screen.Bounds;
             ScreenNumber = screenNumber;
 
-            RawDpi = (int) NativeMethods.GetDpi(screen, NativeMethods.DpiType.Raw);
-            EffectiveDpi = (int) NativeMethods.GetDpi(screen, NativeMethods.DpiType.Effective);
-            AngularDpi = (int) NativeMethods.GetDpi(screen, NativeMethods.DpiType.Angular);
+            RawDpi = (int) Win32Display.GetDpi(screen, DpiType.Raw);
+            EffectiveDpi = (int) Win32Display.GetDpi(screen, DpiType.Effective);
+            AngularDpi = (int) Win32Display.GetDpi(screen, DpiType.Angular);
         }
 
 

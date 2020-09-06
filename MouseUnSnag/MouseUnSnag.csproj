@@ -72,7 +72,9 @@
     <Compile Include="MouseLogic.cs" />
     <Compile Include="MouseSlowdown.cs" />
     <Compile Include="TrayIconApplicationContext.cs" />
-    <Compile Include="NativeMethods.cs" />
+    <Compile Include="Win32Interop\Display\DpiType.cs" />
+    <Compile Include="Win32Interop\KeyPressedStates.cs" />
+    <Compile Include="Win32Interop\NativeMethods.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScreenHandling\Display.cs" />
@@ -80,6 +82,10 @@
     <Compile Include="ScreenHandling\IScreen.cs" />
     <Compile Include="ScreenHandling\ScreenWrapper.cs" />
     <Compile Include="ScreenHandling\VirtualScreen.cs" />
+    <Compile Include="Win32Interop\Display\ProcessDpiAwareness.cs" />
+    <Compile Include="Win32Interop\Display\Win32Display.cs" />
+    <Compile Include="Win32Interop\Win32Keyboard.cs" />
+    <Compile Include="Win32Interop\Win32Mouse.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="version.json" />

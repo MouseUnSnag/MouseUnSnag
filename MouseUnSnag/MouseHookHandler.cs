@@ -9,6 +9,7 @@ using MouseUnSnag.CommandLine;
 using MouseUnSnag.Configuration;
 using MouseUnSnag.Hooking;
 using MouseUnSnag.ScreenHandling;
+using MouseUnSnag.Win32Interop;
 
 namespace MouseUnSnag
 {
@@ -38,7 +39,7 @@ namespace MouseUnSnag
             // Keep a reference to the delegate, so it does not get garbage collected.
             _mouseHookDelegate = LlMouseHookCallback;
             _hookHandler = new HookHandler();
-            _llMouseHook = _hookHandler.SetHook(NativeMethods.WhMouseLl, _mouseHookDelegate);
+            _llMouseHook = _hookHandler.SetHook(Win32Mouse.WhMouseLl, _mouseHookDelegate);
 
             // Run the application
             using (var ctx = new TrayIconApplicationContext(_mouseLogic.Options))
@@ -63,20 +64,19 @@ namespace MouseUnSnag
         /// <returns></returns>
         private IntPtr LlMouseHookCallback(int nCode, uint wParam, IntPtr lParam)
         {
-            if ((nCode == 0) && (wParam == NativeMethods.WmMousemove))
+            if ((nCode == 0) && (wParam == Win32Mouse.WmMouseMove))
             {
-                var hookStruct = (NativeMethods.Msllhookstruct) Marshal.PtrToStructure(lParam, typeof(NativeMethods.Msllhookstruct));
-                var mouse = hookStruct.pt;
+                var mouse = Win32Mouse.GetMouseLocation(lParam);
 
-                if (NativeMethods.IsKeyPressed(NativeMethods.VkCapital) && NativeMethods.GetCursorPos(out var cursor1))
+                if (Win32Keyboard.IsKeyPressed(Win32Keyboard.VkCapital) && NativeMethods.GetCursorPos(out var cursor1))
                 {
-                    NativeMethods.SetCursorPos(_mouseSlowdown.SlowCursor(mouse, cursor1));
+                    Win32Mouse.SetCursorPos(_mouseSlowdown.SlowCursor(mouse, cursor1));
                     return (IntPtr) 1;
                 }
 
                 if (!_cursorScreenBounds.Contains(mouse) && NativeMethods.GetCursorPos(out var cursor) && _mouseLogic.HandleMouse(mouse, cursor, out var newCursor))
                 {
-                    NativeMethods.SetCursorPos(newCursor);
+                    Win32Mouse.SetCursorPos(newCursor);
                     return (IntPtr) 1;
                 }
             }
