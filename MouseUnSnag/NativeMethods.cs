@@ -15,6 +15,7 @@ namespace MouseUnSnag
         public const int WhMouseLl = 14; // Win32 low-level mouse event hook ID.
         public const int WmMousemove = 0x0200;
 
+
         public delegate IntPtr HookProc(int nCode, uint wParam, IntPtr lParam);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
