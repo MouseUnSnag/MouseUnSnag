@@ -120,7 +120,7 @@ namespace MouseUnSnag
         /// <param name="source">Source <see cref="Rectangle"/></param>
         /// <param name="destination">Destination <see cref="Rectangle"/></param>
         /// <returns></returns>
-        public static Point RescaleX(this Point p, Rectangle source, Rectangle destination) => new Point(p.X, ((p.Y - source.Left) * destination.Width / source.Width) + destination.Left);
+        public static Point RescaleX(this Point p, Rectangle source, Rectangle destination) => new Point(((p.X - source.Left) * destination.Width / source.Width) + destination.Left, p.Y);
 
     }
 }
