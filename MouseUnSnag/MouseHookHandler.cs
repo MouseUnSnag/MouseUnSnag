@@ -19,8 +19,6 @@ namespace MouseUnSnag
         private IntPtr _llMouseHookhand = IntPtr.Zero;
         private HookHandler _hookHandler;
 
-        private Rectangle _lastScreenRect = Rectangle.Empty;
-
         private readonly MouseLogic _mouseLogic;
 
         public MouseHookHandler(Options options)
@@ -66,12 +64,11 @@ namespace MouseUnSnag
                 var hookStruct = (NativeMethods.Msllhookstruct) Marshal.PtrToStructure(lParam, typeof(NativeMethods.Msllhookstruct));
                 var mouse = hookStruct.pt;
 
-                if (!_lastScreenRect.Contains(mouse) && NativeMethods.GetCursorPos(out var cursor) && _mouseLogic.HandleMouse(mouse, cursor, out var newCursor))
+                if (!_mouseLogic.LastCursorScreenBounds.Contains(mouse) && NativeMethods.GetCursorPos(out var cursor) && _mouseLogic.HandleMouse(mouse, cursor, out var newCursor))
                 {
                     NativeMethods.SetCursorPos(newCursor);
                     return (IntPtr) 1;
                 }
-                _lastScreenRect = _mouseLogic.LastCursorScreenBounds;
             }
 
             return NativeMethods.CallNextHookEx(_llMouseHookhand, nCode, wParam, lParam);
@@ -92,7 +89,6 @@ namespace MouseUnSnag
             var displays = new DisplayList(Screen.AllScreens.Select(x => (ScreenWrapper) x));
             _mouseLogic.EndScreenUpdate(displays);
             sw.Stop();
-            _lastScreenRect = Rectangle.Empty;
             Debug.WriteLine($"Updated display configuration in: {sw.Elapsed.TotalMilliseconds:0.00} ms");
             Debug.WriteLine(displays.GetScreenInformation());
         }
