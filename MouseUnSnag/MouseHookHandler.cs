@@ -21,10 +21,11 @@ namespace MouseUnSnag
 
         private Rectangle _cursorScreenBounds;
         private readonly MouseLogic _mouseLogic;
-
+        private readonly MouseSlowdown _mouseSlowdown;
 
         public MouseHookHandler(Options options)
         {
+            _mouseSlowdown = new MouseSlowdown();
             _mouseLogic = new MouseLogic(options);
             _mouseLogic.LastCursorBoundsChanged += (sender, args) => _cursorScreenBounds = args.Bounds;
         }
@@ -66,6 +67,12 @@ namespace MouseUnSnag
             {
                 var hookStruct = (NativeMethods.Msllhookstruct) Marshal.PtrToStructure(lParam, typeof(NativeMethods.Msllhookstruct));
                 var mouse = hookStruct.pt;
+
+                if (NativeMethods.IsKeyPressed(NativeMethods.VkCapital) && NativeMethods.GetCursorPos(out var cursor1))
+                {
+                    NativeMethods.SetCursorPos(_mouseSlowdown.SlowCursor(mouse, cursor1));
+                    return (IntPtr) 1;
+                }
 
                 if (!_cursorScreenBounds.Contains(mouse) && NativeMethods.GetCursorPos(out var cursor) && _mouseLogic.HandleMouse(mouse, cursor, out var newCursor))
                 {

@@ -134,7 +134,6 @@ namespace MouseUnSnag.ScreenHandling
         public string GetScreenInformation()
         {
             var sb = new StringBuilder();
-            var n = All.Count;
             
             var i = 0;
             foreach (var s in All)

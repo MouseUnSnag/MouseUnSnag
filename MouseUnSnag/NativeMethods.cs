@@ -6,6 +6,7 @@
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using MouseUnSnag.ScreenHandling;
 
 namespace MouseUnSnag
@@ -37,6 +38,24 @@ namespace MouseUnSnag
 
         [DllImport("user32.dll")]
         internal static extern bool GetCursorPos(out Point lpPoint);
+
+
+        public const int KeyPressed = 0x8000;
+        public const int VkLbutton = 0x01;
+        public const int VkControl = 0x11;
+        public const int VkCapital = 0x14;
+
+        [DllImport("user32.dll")]
+        internal static extern short GetKeyState(int key);
+
+        public static bool IsKeyPressed(int key)
+        {
+            return (GetKeyState(key) & KeyPressed) != 0;
+        }
+
+        public static bool IsKeyPressed(Keys key) => IsKeyPressed((int) key);
+
+        public static bool IsKeyPressed(MouseButtons mouseButton) => IsKeyPressed((int) mouseButton);
 
         /// <summary>
         /// See: https://docs.microsoft.com/en-us/windows/win32/api/shellscalingapi/ne-shellscalingapi-process_dpi_awareness

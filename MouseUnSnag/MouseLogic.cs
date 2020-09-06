@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using MouseUnSnag.Configuration;
 using MouseUnSnag.ScreenHandling;
 
@@ -12,6 +13,7 @@ namespace MouseUnSnag
 {
     public class MouseLogic
     {
+
         private int _evaluations;
         private int _jumps;
 
@@ -167,6 +169,8 @@ namespace MouseUnSnag
             _jumps += 1;
             return true;
         }
+
+        
 
         private static Point RescaleY(Point p, Rectangle source, Rectangle destination)
         {
