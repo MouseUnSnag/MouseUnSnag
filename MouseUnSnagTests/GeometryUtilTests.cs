@@ -198,5 +198,31 @@ namespace MouseUnSnag.Tests
                 }
             }
         }
+
+        [TestMethod()]
+        public void RescaleXTest()
+        {
+            var rSource = new Rectangle(100, 200, 300, 400);
+            var rTarget = new Rectangle(1000, 2000, 3000, 4000);
+
+            var p = new Point(200, 150);
+
+            var expected = new Point(2000, 150);
+            var actual = p.RescaleX(rSource, rTarget);
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        public void RescaleYTest()
+        {
+            var rSource = new Rectangle(100, 200, 300, 400);
+            var rTarget = new Rectangle(1000, 2000, 3000, 4000);
+
+            var p = new Point(200, 300);
+
+            var expected = new Point(200, 3000);
+            var actual = p.RescaleY(rSource, rTarget);
+            Assert.AreEqual(expected, actual);
+        }
     }
 }
