@@ -29,18 +29,6 @@ namespace MouseUnSnag.Win32Interop
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         internal static extern IntPtr GetModuleHandle(string lpModuleName);
 
-        [DllImport("user32.dll")]
-        internal static extern bool SetCursorPos(int X, int Y);
-
-        [DllImport("user32.dll")]
-        internal static extern bool GetCursorPos(out Point lpPoint);
-
-        [DllImport("user32.dll")]
-        internal static extern short GetKeyState(int key);
-
-        [DllImport("SHCore.dll", SetLastError = true)]
-        internal static extern bool SetProcessDpiAwareness(ProcessDpiAwareness awareness);
-
         [StructLayout(LayoutKind.Sequential)]
         internal struct Msllhookstruct
         {
@@ -51,9 +39,26 @@ namespace MouseUnSnag.Win32Interop
             public IntPtr dwExtraInfo;
         }
 
+        [DllImport("user32.dll")]
+        internal static extern bool SetCursorPos(int X, int Y);
+
+        [DllImport("user32.dll")]
+        internal static extern bool GetCursorPos(out Point lpPoint);
+
+        [DllImport("user32.dll")]
+        internal static extern short GetKeyState(int key);
+
+        [DllImport("user32.dll")]
+        internal static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
+
+
+
         //https://msdn.microsoft.com/en-us/library/windows/desktop/dd145062(v=vs.85).aspx
         [DllImport("User32.dll")]
         internal static extern IntPtr MonitorFromPoint([In] Point pt, [In] uint dwFlags);
+
+        [DllImport("SHCore.dll", SetLastError = true)]
+        internal static extern bool SetProcessDpiAwareness(ProcessDpiAwareness awareness);
 
         //https://msdn.microsoft.com/en-us/library/windows/desktop/dn280510(v=vs.85).aspx
         [DllImport("Shcore.dll")]

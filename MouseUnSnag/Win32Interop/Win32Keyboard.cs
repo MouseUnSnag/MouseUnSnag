@@ -11,6 +11,9 @@ namespace MouseUnSnag.Win32Interop
     {
         public const int VkCapital = 0x14;
 
+        private const int KeyeventfExtendedkey = 0x1;
+        private const int KeyeventfKeyup = 0x2;
+
         public static KeyPressedStates KeyStates(int key)
         {
             return (KeyPressedStates) NativeMethods.GetKeyState(key);
@@ -24,6 +27,20 @@ namespace MouseUnSnag.Win32Interop
         public static bool IsKeyPressed(Keys key) => IsKeyPressed((int) key);
 
         public static bool IsKeyPressed(MouseButtons mouseButton) => IsKeyPressed((int) mouseButton);
-        
+
+        public static void ToggleCapsLock()
+        {
+            NativeMethods.keybd_event((byte) Keys.Capital, 0x45, KeyeventfExtendedkey, UIntPtr.Zero);
+            NativeMethods.keybd_event((byte) Keys.Capital, 0x45, KeyeventfExtendedkey | KeyeventfKeyup, UIntPtr.Zero);
+        }
+
+        public static void SetCapsLockState(bool targetState)
+        {
+            var actualState = (KeyStates(Keys.Capital) & KeyPressedStates.KeyToggled) != 0;
+            if (actualState != targetState)
+                ToggleCapsLock();
+        }
+
+
     }
 }
