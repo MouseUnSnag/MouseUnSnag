@@ -19,12 +19,14 @@ namespace MouseUnSnag
         private IntPtr _llMouseHook = IntPtr.Zero;
         private HookHandler _hookHandler;
 
+        private Rectangle _cursorScreenBounds;
         private readonly MouseLogic _mouseLogic;
 
 
         public MouseHookHandler(Options options)
         {
             _mouseLogic = new MouseLogic(options);
+            _mouseLogic.LastCursorBoundsChanged += (sender, args) => _cursorScreenBounds = args.Bounds;
         }
 
         public void Run()
@@ -65,7 +67,7 @@ namespace MouseUnSnag
                 var hookStruct = (NativeMethods.Msllhookstruct) Marshal.PtrToStructure(lParam, typeof(NativeMethods.Msllhookstruct));
                 var mouse = hookStruct.pt;
 
-                if (!_mouseLogic.LastCursorScreenBounds.Contains(mouse) && NativeMethods.GetCursorPos(out var cursor) && _mouseLogic.HandleMouse(mouse, cursor, out var newCursor))
+                if (!_cursorScreenBounds.Contains(mouse) && NativeMethods.GetCursorPos(out var cursor) && _mouseLogic.HandleMouse(mouse, cursor, out var newCursor))
                 {
                     NativeMethods.SetCursorPos(newCursor);
                     return (IntPtr) 1;

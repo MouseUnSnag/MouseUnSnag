@@ -16,8 +16,19 @@ namespace MouseUnSnag
         private int _jumps;
 
         private Point _lastMouse;
+        private Rectangle _lastCursorScreenBounds;
 
-        public Rectangle LastCursorScreenBounds { get; set; }
+        public Rectangle LastCursorScreenBounds
+        {
+            get => _lastCursorScreenBounds;
+            set
+            {
+                if (value == _lastCursorScreenBounds)
+                    return;
+                _lastCursorScreenBounds = value;
+                OnLastCursorBoundsChanged(new BoundsChangedEventArgs(_lastCursorScreenBounds));
+            }
+        }
 
         /// <summary>
         /// Indicates that screens are updating.
@@ -165,6 +176,21 @@ namespace MouseUnSnag
             return p.RescaleY(source, destination);
         }
 
+        public event EventHandler<BoundsChangedEventArgs> LastCursorBoundsChanged;
+        protected virtual void OnLastCursorBoundsChanged(BoundsChangedEventArgs e)
+        {
+            EventHandler<BoundsChangedEventArgs> handler = LastCursorBoundsChanged;
+            handler?.Invoke(this, e);
+        }
+        public class BoundsChangedEventArgs : EventArgs
+        {
+            public Rectangle Bounds { get; }
+
+            public BoundsChangedEventArgs(Rectangle bounds)
+            {
+                Bounds = bounds;
+            }
+        }
 
     }
 }
