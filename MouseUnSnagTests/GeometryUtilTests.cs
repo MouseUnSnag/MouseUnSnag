@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 
 namespace MouseUnSnag.Tests
@@ -119,7 +120,7 @@ namespace MouseUnSnag.Tests
 
             for (var x = rect.Left - 200; x < rect.Right + 200; x++)
             {
-                for (var y = rect.Bottom - 200; y < rect.Top + 200; y++)
+                for (var y = rect.Top - 200; y < rect.Bottom + 200; y++)
                 {
                     var p = new Point(x, y);
                     var expected = GeometryUtil.Sign(GeometryUtil.OutsideDistance(rect, p));
@@ -149,11 +150,11 @@ namespace MouseUnSnag.Tests
             {
                 var xExpected = Constrain(x, rect.Left, rect.Right);
 
-                for (var y = rect.Bottom - 200; y < rect.Top + 200; y++)
+                for (var y = rect.Top - 200; y < rect.Bottom + 200; y++)
                 {
                     var p = new Point(x, y);
                     var actual = GeometryUtil.ClosestBoundaryPoint(rect, p);
-                    var yExpected = Constrain(y, rect.Bottom, rect.Top);
+                    var yExpected = Constrain(y, rect.Top, rect.Bottom);
 
                     Assert.AreEqual(new Point(xExpected, yExpected), actual, $"{x}, {y}");
                 }
@@ -170,12 +171,12 @@ namespace MouseUnSnag.Tests
 
             for (var x = r1.Left - 200; x < r1.Right + 200; x++)
             {
-                for (var y = r1.Bottom - 200; y < r1.Top + 200; y++)
+                for (var y = r1.Top - 200; y < r1.Bottom + 200; y++)
                 {
                     var r2 = new Rectangle(x, y, 10, 10);
 
                     var actual = GeometryUtil.OverlapX(r1, r2);
-                    var expected = ((r2.Left > r1.Left) && (r2.Left < r1.Right));
+                    var expected = ((r2.Right > r1.Left) && (r2.Left < r1.Right));
                     Assert.AreEqual(expected, actual);
                 }
             }
@@ -188,12 +189,12 @@ namespace MouseUnSnag.Tests
 
             for (var x = r1.Left - 200; x < r1.Right + 200; x++)
             {
-                for (var y = r1.Bottom - 200; y < r1.Top + 200; y++)
+                for (var y = r1.Top - 200; y < r1.Bottom + 200; y++)
                 {
                     var r2 = new Rectangle(x, y, 10, 10);
 
-                    var actual = GeometryUtil.OverlapX(r1, r2);
-                    var expected = ((r2.Bottom > r1.Bottom) && (r2.Bottom < r1.Top));
+                    var actual = GeometryUtil.OverlapY(r1, r2);
+                    var expected = ((r2.Bottom > r1.Top) && (r2.Top < r1.Bottom));
                     Assert.AreEqual(expected, actual);
                 }
             }

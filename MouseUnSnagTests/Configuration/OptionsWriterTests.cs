@@ -26,14 +26,18 @@ namespace MouseUnSnag.Configuration.Tests
             optionsWriter = new OptionsWriter(_optionsFileName, null);
             Assert.IsNotNull(optionsWriter);
 
+            var gotException = false;
             try
             {
-                optionsWriter = new OptionsWriter(null, null);
-                Assert.Fail("Should have given an exception");
+                _ = new OptionsWriter(null, null);
             }
             catch (ArgumentNullException)
             {
+                gotException = true;
             }
+
+            Assert.IsTrue(gotException, "Should have given an exception");
+
         }
 
         [TestMethod()]
@@ -53,15 +57,18 @@ namespace MouseUnSnag.Configuration.Tests
         {
             var writer = new OptionsWriter(_optionsFileName);
 
+            
             DeleteAllWriterFiles();
+            var gotException = false;
             try
             {
                 writer.Read();
-                Assert.Fail("Should have failed due to nonexisting file");
             }
             catch (IOException)
             {
+                gotException = true;
             }
+            Assert.IsTrue(gotException, "Should have failed due to nonexisting file");
 
             writer.Write(new Options());
             var options = writer.Read();

@@ -55,7 +55,9 @@
     <Compile Include="Configuration\OptionsSerializerTests.cs" />
     <Compile Include="Configuration\OptionsWriterTests.cs" />
     <Compile Include="GeometryUtilTests.cs" />
+    <Compile Include="MouseLogicTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ScreenHandling\DisplayListTests.cs" />
     <Compile Include="ScreenHandling\DisplayTests.cs" />
     <Compile Include="ScreenHandling\ScreenWrapperTests.cs" />
     <Compile Include="ScreenHandling\VirtualScreenTests.cs" />
