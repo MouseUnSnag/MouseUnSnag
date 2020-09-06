@@ -16,10 +16,11 @@ namespace MouseUnSnag
     {
         // Need to explicitly keep a reference to this, so it does not get "garbage collected."
         private NativeMethods.HookProc _mouseHookDelegate;
-        private IntPtr _llMouseHookhand = IntPtr.Zero;
+        private IntPtr _llMouseHook = IntPtr.Zero;
         private HookHandler _hookHandler;
 
         private readonly MouseLogic _mouseLogic;
+
 
         public MouseHookHandler(Options options)
         {
@@ -34,7 +35,7 @@ namespace MouseUnSnag
             // Keep a reference to the delegate, so it does not get garbage collected.
             _mouseHookDelegate = LlMouseHookCallback;
             _hookHandler = new HookHandler();
-            _llMouseHookhand = _hookHandler.SetHook(NativeMethods.WhMouseLl, _mouseHookDelegate);
+            _llMouseHook = _hookHandler.SetHook(NativeMethods.WhMouseLl, _mouseHookDelegate);
 
             // Run the application
             using (var ctx = new TrayIconApplicationContext(_mouseLogic.Options))
@@ -42,7 +43,7 @@ namespace MouseUnSnag
 
             // Quit
             Debug.WriteLine("Exiting...");
-            HookHandler.UnsetHook(ref _llMouseHookhand);
+            HookHandler.UnsetHook(ref _llMouseHook);
             SystemEvents.DisplaySettingsChanged -= Event_DisplaySettingsChanged;
         }
 
@@ -71,7 +72,7 @@ namespace MouseUnSnag
                 }
             }
 
-            return NativeMethods.CallNextHookEx(_llMouseHookhand, nCode, wParam, lParam);
+            return NativeMethods.CallNextHookEx(_llMouseHook, nCode, wParam, lParam);
         }
 
 
