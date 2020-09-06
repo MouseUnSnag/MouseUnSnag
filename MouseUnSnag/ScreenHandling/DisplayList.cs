@@ -135,7 +135,6 @@ namespace MouseUnSnag.ScreenHandling
         {
             var sb = new StringBuilder();
             var n = All.Count;
-            sb.AppendLine($"There {((n > 1) ? "are" : "is")} {n} SCREEN{((n > 1) ? "S" : "")}:");
             
             var i = 0;
             foreach (var s in All)

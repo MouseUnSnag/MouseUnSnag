@@ -7,7 +7,7 @@ namespace MouseUnSnag.Configuration
         private bool _unstick = true;
         private bool _jump = true;
         private bool _wrap = true;
-        private bool _rescale = false;
+        private bool _rescale;
 
         public bool Unstick
         {

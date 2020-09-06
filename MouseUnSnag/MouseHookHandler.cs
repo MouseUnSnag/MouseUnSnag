@@ -16,9 +16,9 @@ namespace MouseUnSnag
     {
         private DisplayList _displays;
 
-        private int _nEvaluationCount;
-        private int _nJumps;
-        private volatile bool _updatingDisplaySettings;
+        private int _evaluations;
+        private int _jumps;
+        private bool _updatingDisplaySettings;
 
         // Need to explicitly keep a reference to this, so it does not get "garbage collected."
         private NativeMethods.HookProc _mouseHookDelegate;
@@ -33,7 +33,7 @@ namespace MouseUnSnag
         /// <summary>
         /// Command Line Options
         /// </summary>
-        internal Options Options { get; }
+        private Options Options { get; }
 
         public MouseHookHandler(Options options)
         {
@@ -105,43 +105,38 @@ namespace MouseUnSnag
         /// <summary>
         /// Processes mouse events
         /// </summary>
-        /// <param name="mouse">Position of the mouse. Can be outside the screen</param>
+        /// <param name="mouse">Position of the mouse. Can be outside the screen. Is one step ahead of cursor</param>
         /// <param name="cursor">Position of the cursor. Always within screen bounds</param>
         /// <param name="newCursor">New position that shall be taken over</param>
         /// <returns>True if the newCursor Position shall be taken over</returns>
         private bool CheckJumpCursor(Point mouse, Point cursor, out Point newCursor)
         {
+            _evaluations += 1;
+
             newCursor = cursor; // Default is to not move cursor.
 
-            // Gather pertinent information about cursor, mouse, screens.
-            
-            var lastScreen = _displays.WhichScreen(_lastMouse);
+            //var lastScreen = _displays.WhichScreen(_lastMouse);
             var cursorScreen = _displays.WhichScreen(cursor);
             var mouseScreen = _displays.WhichScreen(mouse);
-            var isStuck = (cursor != _lastMouse) && (mouseScreen != cursorScreen) || (mouseScreen != lastScreen);
+            var isStuck = (cursor != _lastMouse) && (mouseScreen != cursorScreen);// || (mouseScreen != lastScreen);
             var stuckDirection = GeometryUtil.OutsideDirection(cursorScreen.Bounds, mouse);
 
-            
-            Debug.WriteLine($"{_nEvaluationCount} StuckDirection/Distance{stuckDirection}/{GeometryUtil.OutsideDistance(cursorScreen.Bounds, mouse)} " +
-                             $"cur_mouse:{mouse}  prev_mouse:{_lastMouse} ==? cursor:{cursor} (OnMon#{cursorScreen}/{mouseScreen})  " +
-                             $"#UnSnags {_nJumps}   {(isStuck ? "--STUCK--" : "         ")}   ");
-
-            _nEvaluationCount += 1;
+            Debug.WriteLine($"{_evaluations} StuckDirection/Distance{stuckDirection}/{GeometryUtil.OutsideDistance(cursorScreen.Bounds, mouse)} cur_mouse:{mouse}  prev_mouse:{_lastMouse} ==? cursor:{cursor} (OnMon#{cursorScreen}/{mouseScreen})  #UnSnags {_jumps}   {(isStuck ? "--STUCK--" : "         ")}   ");
 
             _lastScreenRect = cursorScreen.Bounds;
             _lastMouse = mouse;
 
-            // Let caller know we did NOT jump the cursor.
             if (!isStuck)
                 return false;
 
             var jumpScreen = _displays.ScreenInDirection(stuckDirection, cursorScreen.Bounds);
 
-            // If the mouse "location" (which can take on a value beyond the current
-            // cursor screen) has a value, then it is "within" another valid screen
-            // bounds, so just jump to it!
+
             if (mouseScreen != null)
             {
+                // If the mouse "location" (which can take on a value beyond the current
+                // cursor screen) has a value, then it is "within" another valid screen
+                // bounds, so just jump to it!
                 Debug.WriteLine("MouseScreen");
 
                 if (!Options.Unstick)
@@ -149,11 +144,7 @@ namespace MouseUnSnag
 
                 if (Options.Rescale)
                 {
-                    // FIXME: This is a hack for mouse scaling of adjacent screens
-                    var nc = mouse;
-                    nc.Y = nc.Y * mouseScreen.Bounds.Height / cursorScreen.Bounds.Height;
-                    Debug.WriteLine($"R: {nc}, {mouseScreen.Bounds.Height}>{cursorScreen.Bounds.Height}");
-                    newCursor = nc;
+                    newCursor = RescaleY(mouse, cursorScreen.Bounds, mouseScreen.Bounds);
                 }
                 else
                 {
@@ -169,7 +160,7 @@ namespace MouseUnSnag
                 // FIXME: This is a hack for mouse scaling of adjacent screens
                 var c = cursor;
                 if (Options.Rescale)
-                    c.Y = c.Y * jumpScreen.Bounds.Height / cursorScreen.Bounds.Height;
+                    c = RescaleY(cursor, cursorScreen.Bounds, jumpScreen.Bounds);
 
                 newCursor = jumpScreen.Bounds.ClosestBoundaryPoint(c);
             }
@@ -180,12 +171,17 @@ namespace MouseUnSnag
                     return false;
 
                 var wrapScreen = _displays.WrapScreen(stuckDirection, cursor);
-                var wrapPoint = new Point(
-                    stuckDirection.X == 1 ? wrapScreen.Bounds.Left : wrapScreen.Bounds.Right - 1, cursor.Y);
+                var wrapPoint = new Point(stuckDirection.X == 1 ? wrapScreen.Bounds.Left : wrapScreen.Bounds.Right - 1, cursor.Y);
 
                 // Don't wrap cursor if jumping is disabled and it would need to jump.
                 if (!Options.Jump && !wrapScreen.Bounds.Contains(wrapPoint))
                     return false;
+
+                if (Options.Rescale)
+                {
+                    // Currently does not work properly. Wrapping from small screen bottom half to big screen appears to set the newCursor Position correctly, but the actual cursor does not move there.
+                    //wrapPoint = RescaleY(wrapPoint, cursorScreen.Bounds, wrapScreen.Bounds);
+                }
 
                 newCursor = wrapScreen.Bounds.ClosestBoundaryPoint(wrapPoint);
             }
@@ -195,12 +191,20 @@ namespace MouseUnSnag
                 return false;
             }
 
-            ++_nJumps;
-            Debug.WriteLine("\n -- JUMPED!!! --");
+            Debug.WriteLine($"{cursor} -> {newCursor}");
+            _jumps += 1;
             return true;
         }
 
-        
+
+        private static Point RescaleY(Point p, Rectangle source, Rectangle destination)
+        {
+            if (Math.Abs(source.Top - destination.Top) > 20)
+                return p;
+
+            return p.RescaleY(source, destination);
+        }
+
 
         private void Event_DisplaySettingsChanged(object sender, EventArgs e)
         {

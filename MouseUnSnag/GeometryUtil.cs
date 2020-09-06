@@ -60,13 +60,7 @@ namespace MouseUnSnag
         /// <returns><see cref="Point"/> where X and Y represents the distance from the rectangle</returns>
         public static Point OutsideDistance(Rectangle R, Point P) => new Point(OutsideXDistance(R, P), OutsideYDistance(R, P));
 
-        // This is sort-of the "opposite" of above. In a sense it "captures" the point to the
-        // boundary/inside of the rectangle, rather than "excluding" it to the exterior of the rectangle.
-        //
-        // If the point is outside the rectangle, then it returns the closest location on the
-        // rectangle boundary to the Point. If Point is inside Rectangle, then it just returns
-        // the point.
-
+        
         /// <summary>
         /// This is sort-of the "opposite" of OutsideDistance. In a sense it "captures" the point to the
         /// boundary/inside of the rectangle, rather than "excluding" it to the exterior of the rectangle.
@@ -108,5 +102,25 @@ namespace MouseUnSnag
         /// <param name="R2"><see cref="Rectangle"/></param>
         /// <returns></returns>
         public static bool OverlapY(Rectangle R1, Rectangle R2) => (R1.Top < R2.Bottom) && (R1.Bottom > R2.Top);
+
+
+        /// <summary>
+        /// Rescales the Y coordinate of a point from one rectangle to another. Reference: Top
+        /// </summary>
+        /// <param name="p"><see cref="Point"/> to rescale</param>
+        /// <param name="source">Source <see cref="Rectangle"/></param>
+        /// <param name="destination">Destination <see cref="Rectangle"/></param>
+        /// <returns></returns>
+        public static Point RescaleY(this Point p, Rectangle source, Rectangle destination) => new Point(p.X, ((p.Y - source.Top) * destination.Height / source.Height) + destination.Top);
+        
+        /// <summary>
+        /// Rescales the X coordinate of a point from one rectangle to another. Reference: Left
+        /// </summary>
+        /// <param name="p"><see cref="Point"/> to rescale</param>
+        /// <param name="source">Source <see cref="Rectangle"/></param>
+        /// <param name="destination">Destination <see cref="Rectangle"/></param>
+        /// <returns></returns>
+        public static Point RescaleX(this Point p, Rectangle source, Rectangle destination) => new Point(p.X, ((p.Y - source.Left) * destination.Width / source.Width) + destination.Left);
+
     }
 }
