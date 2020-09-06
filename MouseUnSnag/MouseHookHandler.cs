@@ -24,7 +24,8 @@ namespace MouseUnSnag
         private readonly MouseLogic _mouseLogic;
         private readonly MouseSlowdown _mouseSlowdown;
 
-        private KeyPressedStates _lastCapsState;
+        private bool _lastCapsPressed;
+        private bool _capsToggledStateAtBeginning;
 
         public MouseHookHandler(Options options)
         {
@@ -72,10 +73,17 @@ namespace MouseUnSnag
 
                 var capsState = Win32Keyboard.KeyStates(Keys.CapsLock);
                 var capsPressed = (capsState & KeyPressedStates.KeyPressed) != 0;
-                var capsToggled = (capsState & KeyPressedStates.KeyToggled) != 0;
-                
-                if (!capsPressed && capsToggled)
-                    Win32Keyboard.SetCapsLockState(false);
+
+                if (capsPressed != _lastCapsPressed)
+                {
+                    Debug.WriteLine($"{capsState}: {capsPressed}, {_lastCapsPressed}, {_capsToggledStateAtBeginning}");
+                    if (capsPressed)
+                        _capsToggledStateAtBeginning = (capsState & KeyPressedStates.KeyToggled) == 0;
+                    else
+                        Win32Keyboard.SetCapsLockState(_capsToggledStateAtBeginning);
+
+                    _lastCapsPressed = capsPressed;
+                }
 
                 if (capsPressed && NativeMethods.GetCursorPos(out var cursor1))
                 {
