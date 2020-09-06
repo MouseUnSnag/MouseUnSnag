@@ -57,7 +57,7 @@ namespace MouseUnSnag.Tests
                 {
                     var p = new Point(x, y);
                     var actual = GeometryUtil.OutsideXDistance(rect, p);
-                    var expected = int.MinValue;
+                    int expected;
                     if (x < rect.Left)
                         expected = (x - rect.Left);
                     else if (x < rect.Right)
@@ -77,17 +77,17 @@ namespace MouseUnSnag.Tests
 
             for (var x = -1000; x < 1000; x += 100)
             {
-                for (var y = rect.Bottom - 200; y < rect.Top + 200; y++)
+                for (var y = rect.Top - 200; y < rect.Bottom + 200; y++)
                 {
                     var p = new Point(x, y);
                     var actual = GeometryUtil.OutsideYDistance(rect, p);
-                    var expected = int.MinValue;
-                    if (x < rect.Bottom)
-                        expected = (x - rect.Bottom);
-                    else if (x < rect.Top)
+                    int expected;
+                    if (y < rect.Top)
+                        expected = (y - rect.Top);
+                    else if (y < rect.Bottom)
                         expected = 0;
                     else
-                        expected = x - (rect.Top - 1);
+                        expected = y - (rect.Bottom - 1);
                     
                     Assert.AreEqual(expected, actual, $"{x}, {y}");
                 }
@@ -101,7 +101,7 @@ namespace MouseUnSnag.Tests
 
             for (var x = rect.Left - 200; x < rect.Right + 200; x++)
             {
-                for (var y = rect.Bottom - 200; y < rect.Top + 200; y++)
+                for (var y = rect.Top - 200; y < rect.Bottom + 200; y++)
                 {
                     var p = new Point(x, y);
                     var expected = new Point(GeometryUtil.OutsideXDistance(rect, p), GeometryUtil.OutsideYDistance(rect, p));
