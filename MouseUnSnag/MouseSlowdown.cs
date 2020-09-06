@@ -18,8 +18,8 @@ namespace MouseUnSnag
         private readonly int _slowFactorMultiplier = 1000;
 
 
-        public float SpeedFactor { get; set; } = 2.25f;
-        public int SlowFactorPerMille { get; set; } = 4000;
+        public float SpeedFactor { get; set; } = 0.33f;
+        public int SlowFactorPerMille { get; set; } = 3000;
         
 
         /// <summary>
