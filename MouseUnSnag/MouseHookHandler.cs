@@ -74,7 +74,11 @@ namespace MouseUnSnag
 
             // Run the application
             using (var ctx = new TrayIconApplicationContext(_mouseLogic.Options))
+            {
+                // Update the number of unsnags displayed when hovering over the tray icon
+                ctx.SetToolTip(() => $"Unsnags: {_mouseLogic.Jumps}");
                 Application.Run(ctx);
+            }
 
             // Quit
             Debug.WriteLine("Exiting...");

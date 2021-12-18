@@ -31,6 +31,15 @@ namespace MouseUnSnag
             };
         }
 
+        public delegate string TooltipGenerator();
+
+        public void SetToolTip(TooltipGenerator tooltipGenerator)
+        {
+            _trayIcon.MouseMove += new MouseEventHandler((sender, e) => {
+                _trayIcon.Text = tooltipGenerator();
+            });
+        }
+
         private IEnumerable<MenuItem> MakeMenuItems(Options options)
         {
 
@@ -82,7 +91,6 @@ namespace MouseUnSnag
                 })
             };
         }
-        
 
     }
 }

@@ -15,7 +15,7 @@ namespace MouseUnSnag
     {
 
         private int _evaluations;
-        private int _jumps;
+        public int Jumps { get; private set; }
 
         private Point _lastMouse;
         private Rectangle _lastCursorScreenBounds;
@@ -104,7 +104,7 @@ namespace MouseUnSnag
             var stuckDirection = GeometryUtil.OutsideDirection(cursorScreen.Bounds, mouse);
 
 
-            Debug.WriteLine($"{_evaluations}: StuckDirection/Distance{stuckDirection}/{GeometryUtil.OutsideDistance(cursorScreen.Bounds, mouse)} cur_mouse:{mouse}  prev_mouse:{_lastMouse} ==? cursor:{cursor} (OnMon#{cursorScreen}/{mouseScreen})  #UnSnags {_jumps}   {(isStuck ? "--STUCK--" : "         ")}   ");
+            Debug.WriteLine($"{_evaluations}: StuckDirection/Distance{stuckDirection}/{GeometryUtil.OutsideDistance(cursorScreen.Bounds, mouse)} cur_mouse:{mouse}  prev_mouse:{_lastMouse} ==? cursor:{cursor} (OnMon#{cursorScreen}/{mouseScreen})  #UnSnags {Jumps}   {(isStuck ? "--STUCK--" : "         ")}   ");
 
             LastCursorScreenBounds = cursorScreen.Bounds;
             _lastMouse = mouse;
@@ -166,7 +166,7 @@ namespace MouseUnSnag
             }
 
             Debug.WriteLine($"{cursor} -> {newCursor}");
-            _jumps += 1;
+            Jumps += 1;
             return true;
         }
 
