@@ -1,0 +1,28 @@
+name: Build
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  build:
+    strategy:
+      matrix:
+        configuration: [Debug, Release]
+    runs-on: windows-latest
+    env:
+      SolutionName: MouseUnSnag.sln
+      TestProjectPath: MouseUnSnagTests\MouseUnSnagTests.csproj
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Build Solution
+      shell: cmd
+      run: |
+        echo ::stop-commands::${{ github.run_id }}-${{ github.run_attempt }}
+        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+        msbuild %SolutionName% /p:Configuration=%Configuration% /p:Platform="Any CPU"
+      env:
+        Configuration: ${{ matrix.configuration }}
