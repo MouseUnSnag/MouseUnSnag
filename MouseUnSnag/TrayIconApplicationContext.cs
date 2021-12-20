@@ -3,10 +3,10 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using MouseUnSnag.CommandLine;
 using MouseUnSnag.Configuration;
 
 namespace MouseUnSnag
@@ -87,7 +87,7 @@ namespace MouseUnSnag
                 new MenuItem("Exit", delegate
                 {
                     _trayIcon.Visible = false;
-                    Application.Exit();
+                    Environment.Exit(0);
                 })
             };
         }
