@@ -1,6 +1,6 @@
-
 #Ignore thumbnails created by Windows
 Thumbs.db
+
 #Ignore files built by Visual Studio
 *.obj
 *.exe
@@ -28,5 +28,9 @@ obj/
 _ReSharper*/
 [Tt]est[Rr]esult*
 .vs/
+
+# Jetbrains (Rider)
+.idea/
+
 #Nuget packages folder
 packages/
