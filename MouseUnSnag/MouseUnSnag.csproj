@@ -70,7 +70,6 @@
     <Compile Include="Hooking\HookHandler.cs" />
     <Compile Include="MouseHookHandler.cs" />
     <Compile Include="MouseLogic.cs" />
-    <Compile Include="MouseSlowdown.cs" />
     <Compile Include="TrayIconApplicationContext.cs" />
     <Compile Include="Win32Interop\Display\DpiType.cs" />
     <Compile Include="Win32Interop\KeyPressedStates.cs" />
