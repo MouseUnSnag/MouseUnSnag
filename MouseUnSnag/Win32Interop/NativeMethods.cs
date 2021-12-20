@@ -6,8 +6,6 @@
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
-using MouseUnSnag.ScreenHandling;
 using MouseUnSnag.Win32Interop.Display;
 
 namespace MouseUnSnag.Win32Interop
@@ -44,13 +42,6 @@ namespace MouseUnSnag.Win32Interop
 
         [DllImport("user32.dll")]
         internal static extern bool GetCursorPos(out Point lpPoint);
-
-        [DllImport("user32.dll")]
-        internal static extern short GetKeyState(int key);
-
-        [DllImport("user32.dll")]
-        internal static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
-
 
 
         //https://msdn.microsoft.com/en-us/library/windows/desktop/dd145062(v=vs.85).aspx
