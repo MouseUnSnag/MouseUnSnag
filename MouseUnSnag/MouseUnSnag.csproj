@@ -70,10 +70,8 @@
     <Compile Include="Hooking\HookHandler.cs" />
     <Compile Include="MouseHookHandler.cs" />
     <Compile Include="MouseLogic.cs" />
-    <Compile Include="MouseSlowdown.cs" />
     <Compile Include="TrayIconApplicationContext.cs" />
     <Compile Include="Win32Interop\Display\DpiType.cs" />
-    <Compile Include="Win32Interop\KeyPressedStates.cs" />
     <Compile Include="Win32Interop\NativeMethods.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -84,7 +82,6 @@
     <Compile Include="ScreenHandling\VirtualScreen.cs" />
     <Compile Include="Win32Interop\Display\ProcessDpiAwareness.cs" />
     <Compile Include="Win32Interop\Display\Win32Display.cs" />
-    <Compile Include="Win32Interop\Win32Keyboard.cs" />
     <Compile Include="Win32Interop\Win32Mouse.cs" />
   </ItemGroup>
   <ItemGroup>
