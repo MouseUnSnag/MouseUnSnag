@@ -21,8 +21,15 @@ jobs:
     - name: Build Solution
       shell: cmd
       run: |
-        echo ::stop-commands::${{ github.run_id }}-${{ github.run_attempt }}
+        echo ::stop-commands::build-${{ github.run_id }}-${{ github.run_attempt }}
         call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-        msbuild %SolutionName% /p:Configuration=%Configuration% /p:Platform="Any CPU"
+        msbuild %SolutionName% /restore /property:Configuration=%Configuration% /property:Platform="Any CPU"
+      env:
+        Configuration: ${{ matrix.configuration }}
+    - name: Test Solution
+      shell: cmd
+      run: |
+        echo ::stop-commands::test-${{ github.run_id }}-${{ github.run_attempt }}
+        %USERPROFILE%\.nuget\packages\nunit.consolerunner\3.15.0\tools\nunit3-console.exe --config=%Configuration% %TestProjectPath%
       env:
         Configuration: ${{ matrix.configuration }}

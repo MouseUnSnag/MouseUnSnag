@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
 using MouseUnSnag.ScreenHandling;
 using System;
 using System.Collections.Generic;
@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace MouseUnSnag.ScreenHandling.Tests
 {
-    [TestClass()]
+    [TestFixture]
     public class DisplayListTests
     {
-        [TestMethod()]
+        [Test]
         public void DisplayListTest()
         {
             var displayList = new DisplayList(new List<IScreen>());
@@ -39,7 +39,7 @@ namespace MouseUnSnag.ScreenHandling.Tests
 
         }
 
-        [TestMethod()]
+        [Test]
         public void GetScreenInformationTest()
         {
             var displays = new DisplayList(

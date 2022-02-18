@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
 using MouseUnSnag.CommandLine;
 using System;
 using System.Collections.Generic;
@@ -9,10 +9,10 @@ using MouseUnSnag.Configuration;
 
 namespace MouseUnSnag.Configuration.Tests
 {
-    [TestClass()]
+    [TestFixture]
     public class OptionsTests
     {
-        [TestMethod()]
+        [Test]
         public void EventTest()
         {
             var options = new Options();

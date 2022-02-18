@@ -1,14 +1,14 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 
 namespace MouseUnSnag.Tests
 {
-    [TestClass()]
+    [TestFixture]
     public class GeometryUtilTests
     {
-        [TestMethod()]
+        [Test]
         public void SignTest()
         {
             var lst = new List<(Point toTest, Point expected)>()
@@ -28,7 +28,7 @@ namespace MouseUnSnag.Tests
             }
         }
 
-        [TestMethod()]
+        [Test]
         public void DirectionTest()
         {
             var lst = new List<(Point p1, Point p2, Point expected)>()
@@ -47,7 +47,7 @@ namespace MouseUnSnag.Tests
             }
         }
 
-        [TestMethod()]
+        [Test]
         public void OutsideXDistanceTest()
         {
             var rect = new Rectangle(100, 200, 300, 400);
@@ -71,7 +71,7 @@ namespace MouseUnSnag.Tests
             }
         }
 
-        [TestMethod()]
+        [Test]
         public void OutsideYDistanceTest()
         {
             var rect = new Rectangle(100, 200, 300, 400);
@@ -95,7 +95,7 @@ namespace MouseUnSnag.Tests
             }
         }
 
-        [TestMethod()]
+        [Test]
         public void OutsideDistanceTest()
         {
             var rect = new Rectangle(100, 200, 300, 400);
@@ -113,7 +113,7 @@ namespace MouseUnSnag.Tests
             }
         }
 
-        [TestMethod()]
+        [Test]
         public void OutsideDirectionTest()
         {
             var rect = new Rectangle(100, 200, 300, 400);
@@ -131,7 +131,7 @@ namespace MouseUnSnag.Tests
             }
         }
 
-        [TestMethod()]
+        [Test]
         public void ClosestBoundaryPointTest()
         {
             int Constrain(int location, int lowerBound, int upperBound)
@@ -164,7 +164,7 @@ namespace MouseUnSnag.Tests
 
 
 
-        [TestMethod()]
+        [Test]
         public void OverlapXTest()
         {
             var r1 = new Rectangle(100, 200, 300, 400);
@@ -182,7 +182,7 @@ namespace MouseUnSnag.Tests
             }
         }
 
-        [TestMethod()]
+        [Test]
         public void OverlapYTest()
         {
             var r1 = new Rectangle(100, 200, 300, 400);
@@ -200,7 +200,7 @@ namespace MouseUnSnag.Tests
             }
         }
 
-        [TestMethod()]
+        [Test]
         public void RescaleXTest()
         {
             var rSource = new Rectangle(100, 200, 300, 400);
@@ -213,7 +213,7 @@ namespace MouseUnSnag.Tests
             Assert.AreEqual(expected, actual);
         }
 
-        [TestMethod()]
+        [Test]
         public void RescaleYTest()
         {
             var rSource = new Rectangle(100, 200, 300, 400);

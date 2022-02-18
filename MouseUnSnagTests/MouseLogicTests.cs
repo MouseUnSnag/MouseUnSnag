@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
 using MouseUnSnag;
 using System;
 using System.Collections.Generic;
@@ -12,10 +12,10 @@ using MouseUnSnag.ScreenHandling;
 
 namespace MouseUnSnag.Tests
 {
-    [TestClass()]
+    [TestFixture]
     public class MouseLogicTests
     {
-        [TestMethod()]
+        [Test]
         public void MouseLogicTest()
         {
             var opts = new Options();
@@ -37,7 +37,7 @@ namespace MouseUnSnag.Tests
             Assert.IsTrue(gotException, "Should have thrown");
         }
 
-        [TestMethod()]
+        [Test]
         public void BeginAndEndScreenUpdateTest()
         {
             var opts = new Options();

@@ -4,15 +4,15 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using MouseUnSnag.Configuration;
 
 namespace MouseUnSnagTests.Configuration
 {
-    [TestClass()]
+    [TestFixture]
     public class OptionsHelpers
     {
-        [TestMethod()]
+        [Test]
         public void TestOptionsPermutationsTests()
         {
             Assert.IsTrue(OptionPermutations().Count() > 10);

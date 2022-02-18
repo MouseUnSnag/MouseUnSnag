@@ -1,12 +1,12 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
 using System.Drawing;
 
 namespace MouseUnSnag.ScreenHandling.Tests
 {
-    [TestClass()]
+    [TestFixture]
     public class VirtualScreenTests
     {
-        [TestMethod()]
+        [Test]
         public void VirtualScreenTest()
         {
             var bitsPerPixel = 24;

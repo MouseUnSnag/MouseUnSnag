@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
 using MouseUnSnag.Configuration;
 using System;
 using System.Collections.Generic;
@@ -12,12 +12,12 @@ using MouseUnSnagTests.Configuration;
 
 namespace MouseUnSnag.Configuration.Tests
 {
-    [TestClass()]
+    [TestFixture]
     public class OptionsWriterTests
     {
         private string _optionsFileName => Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "OptionsWriterTests", "config.txt");
 
-        [TestMethod()]
+        [Test]
         public void OptionsWriterTest()
         {
             var optionsWriter = new OptionsWriter(_optionsFileName, new OptionsSerializer());
@@ -40,7 +40,7 @@ namespace MouseUnSnag.Configuration.Tests
 
         }
 
-        [TestMethod()]
+        [Test]
         public void WriteTest()
         {
             var writer = new OptionsWriter(_optionsFileName);
@@ -52,7 +52,7 @@ namespace MouseUnSnag.Configuration.Tests
             writer.Write(new Options());
         }
 
-        [TestMethod()]
+        [Test]
         public void ReadTest()
         {
             var writer = new OptionsWriter(_optionsFileName);
@@ -81,7 +81,7 @@ namespace MouseUnSnag.Configuration.Tests
             Assert.IsNotNull(options);
         }
 
-        [TestMethod()]
+        [Test]
         public void TryReadTest()
         {
             var writer = new OptionsWriter(_optionsFileName);
@@ -96,7 +96,7 @@ namespace MouseUnSnag.Configuration.Tests
         }
 
 
-        [TestMethod()]
+        [Test]
         public void RoundTripTest()
         {
             var writer = new OptionsWriter(_optionsFileName);

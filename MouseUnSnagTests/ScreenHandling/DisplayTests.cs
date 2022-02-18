@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
 using MouseUnSnag.ScreenHandling;
 using System;
 using System.Collections.Generic;
@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace MouseUnSnag.ScreenHandling.Tests
 {
-    [TestClass()]
+    [TestFixture]
     public class DisplayTests
     {
-        [TestMethod()]
+        [Test]
         public void DisplayTest()
         {
             var screen = new VirtualScreen(99,
