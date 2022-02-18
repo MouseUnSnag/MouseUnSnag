@@ -1,11 +1,11 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
 
 namespace MouseUnSnag.Configuration.Tests
 {
-    [TestClass()]
+    [TestFixture]
     public class OptionsTests
     {
-        [TestMethod()]
+        [Test]
         public void EventTest()
         {
             var options = new Options();

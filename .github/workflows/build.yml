@@ -26,3 +26,10 @@ jobs:
         msbuild %SolutionName% /restore /property:Configuration=%Configuration% /property:Platform="Any CPU"
       env:
         Configuration: ${{ matrix.configuration }}
+    - name: Test Solution
+      shell: cmd
+      run: |
+        echo ::stop-commands::test-${{ github.run_id }}-${{ github.run_attempt }}
+        %USERPROFILE%\.nuget\packages\nunit.consolerunner\3.15.0\tools\nunit3-console.exe --config=%Configuration% %TestProjectPath%
+      env:
+        Configuration: ${{ matrix.configuration }}
