@@ -67,32 +67,42 @@ namespace MouseUnSnag.ScreenHandling
         }
 
         /// <summary>
-        /// Find the first monitor (first one we come across in the for() loop)
-        /// that is in the direction of the point.
+        /// Find the all the monitors that are in the direction of the point. Since
+        /// this method is used for monitor jumping, diagonal monitors are included in
+        /// horizontal and vertical directions, and horizontal and vertical monitors
+        /// are included in diagonal directions.
         /// </summary>
         /// <param name="dir">Direction</param>
         /// <param name="curScreen">Current Screen</param>
         /// <returns></returns>
-        public Display ScreenInDirection(Point dir, Rectangle curScreen)
+        private IEnumerable<Display> ScreensInDirection(Point dir, Rectangle curScreen) => All.Where(screen => {
+            var screenDir = GeometryUtil.OutsideDirection(curScreen, screen.Bounds);
+            return screenDir.X == dir.X && Math.Abs(screenDir.Y - dir.Y) <= 1.0
+                || screenDir.Y == dir.Y && Math.Abs(screenDir.X - dir.X) <= 1.0;
+        });
+
+        /// <summary>
+        /// Finds the best screen to "jump" the cursor. The best screen to jump to should be in
+        /// the direction the cursor is moving from the current screen, and should match human
+        /// intuition. Currently, we pick the closest screen by euclidean distance.
+        /// </summary>
+        /// <param name="mouse">Mouse</param>
+        /// <param name="curScreen">Current Screen</param>
+        /// <returns></returns>
+        public Display JumpScreen(Point mouse, Rectangle curScreen)
         {
-            // Screen must be strictly above/below/beside. For instance, for a monitor to be
-            // "above", the monitor's Bottom equal to the current screen's Top ("current
-            // screen" is where the Cursor (NOT the mouse!!) is currently).
-            foreach (var s in All)
+            var candidates = ScreensInDirection(GeometryUtil.OutsideDirection(curScreen, mouse), curScreen);
+            Display jumpScreen = null;
+            var minDist = double.PositiveInfinity;
+            foreach (var candidate in candidates)
             {
-                if (((dir.X == 1) && (curScreen.Right == s.Bounds.Left)) ||
-                    ((dir.X == -1) && (curScreen.Left == s.Bounds.Right)) ||
-                    ((dir.Y == 1) && (curScreen.Bottom == s.Bounds.Top)) ||
-                    ((dir.Y == -1) && (curScreen.Top == s.Bounds.Bottom)))
-                {
-                    return s;
+                var dist = GeometryUtil.Magnitude(GeometryUtil.OutsideDistance(candidate.Bounds, mouse));
+                if (dist < minDist) {
+                    minDist = dist;
+                    jumpScreen = candidate;
                 }
             }
-            return null;
-
-            // May want to update the above routine, which arbitrarily selects the monitor that
-            // happens to come first in the for() loop. We should probably do a little extra work,
-            // and select the monitor that is closest to the mouse position.
+            return jumpScreen;
         }
 
 

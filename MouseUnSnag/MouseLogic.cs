@@ -114,8 +114,7 @@ namespace MouseUnSnag
                 return false;
             }
 
-            var jumpScreen = displays.ScreenInDirection(stuckDirection, cursorScreen.Bounds);
-
+            var jumpScreen = displays.JumpScreen(mouse, cursorScreen.Bounds);
 
             if (mouseScreen != null)
             {
