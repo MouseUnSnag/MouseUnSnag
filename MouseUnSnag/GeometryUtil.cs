@@ -103,9 +103,9 @@ namespace MouseUnSnag
         /// <param name="p"><see cref="Point"/></param>
         /// <returns><see cref="Point"/></returns>
         public static Point OutsideDirection(Rectangle r1, Rectangle r2) => (OverlapX(r1, r2), OverlapY(r1, r2)) switch {
-            (false, false) => new Point(Math.Sign(r1.Left - r2.Left), Math.Sign(r1.Top - r2.Top)),
-            (false, true) => new Point(Math.Sign(r1.Left - r2.Left), 0),
-            (true, false) => new Point(0, Math.Sign(r1.Top - r2.Top)),
+            (false, false) => new Point(Math.Sign(r2.Left - r1.Left), Math.Sign(r2.Top - r1.Top)),
+            (false, true) => new Point(Math.Sign(r2.Left - r1.Left), 0),
+            (true, false) => new Point(0, Math.Sign(r2.Top - r1.Top)),
             (true, true) => new Point(0, 0),
         };
 

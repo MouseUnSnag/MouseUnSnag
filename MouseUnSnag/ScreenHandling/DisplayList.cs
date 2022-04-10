@@ -77,8 +77,8 @@ namespace MouseUnSnag.ScreenHandling
         /// <returns></returns>
         private IEnumerable<Display> ScreensInDirection(Point dir, Rectangle curScreen) => All.Where(screen => {
             var screenDir = GeometryUtil.OutsideDirection(curScreen, screen.Bounds);
-            return screenDir.X == dir.X && Math.Abs(screenDir.Y - dir.Y) <= 1.0
-                || screenDir.Y == dir.Y && Math.Abs(screenDir.X - dir.X) <= 1.0;
+            return screenDir.X * dir.X == 1 && Math.Abs(screenDir.Y - dir.Y) <= 1
+                || screenDir.Y * dir.Y == 1 && Math.Abs(screenDir.X - dir.X) <= 1;
         });
 
         /// <summary>
