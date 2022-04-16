@@ -50,5 +50,21 @@ namespace MouseUnSnag.ScreenHandling.Tests
             Assert.IsNotNull(screenInfo);
             Console.WriteLine(screenInfo);
         }
+
+        [TestMethod()]
+        public void JumpScreenTest()
+        {
+            // Test arragements from issue #16
+            var top_left = new VirtualScreen(32, new Rectangle(0, 0, 800, 600), "top_left", true, new Rectangle(0, 0, 800, 600));
+            var top_right = new VirtualScreen(32, new Rectangle(800, 0, 800, 600), "top_right", true, new Rectangle(800, 0, 800, 600));
+            var bottom_left = new VirtualScreen(32, new Rectangle(0, 600, 800, 600), "bottom_left", true, new Rectangle(0, 600, 800, 600));
+            var bottom_right = new VirtualScreen(32, new Rectangle(800, 600, 800, 600), "bottom_right", true, new Rectangle(800, 600, 800, 600));
+            var arragement1 = new DisplayList(new []{top_left, top_right, bottom_right});
+            var arragement2 = new DisplayList(new []{bottom_left, top_left, top_right});
+
+            Assert.AreEqual(arragement1.JumpScreen(new Point(810, 0), top_left.Bounds).Screen, top_right);
+            Assert.AreEqual(arragement2.JumpScreen(new Point(790, 0), top_right.Bounds).Screen, top_left);
+            Assert.AreEqual(arragement2.JumpScreen(new Point(790, -10), top_right.Bounds).Screen, top_left);
+        }
     }
 }

@@ -114,8 +114,7 @@ namespace MouseUnSnag
                 return false;
             }
 
-            var jumpScreen = displays.ScreenInDirection(stuckDirection, cursorScreen.Bounds);
-
+            var jumpScreen = displays.JumpScreen(mouse, cursorScreen.Bounds);
 
             if (mouseScreen != null)
             {
@@ -129,6 +128,11 @@ namespace MouseUnSnag
             }
             else if (jumpScreen != null)
             {
+                if (stuckDirection.X != 0 && stuckDirection.Y != 0 && !Options.Unstick) {
+                    Debug.WriteLine("  > Refusing to jump diagonally while unstick disabled");
+                    return false;
+                }
+
                 Debug.WriteLine("  > JumpScreen");
                 if (!Options.Jump)
                     return false;

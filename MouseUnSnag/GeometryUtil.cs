@@ -21,6 +21,13 @@ namespace MouseUnSnag
         public static Point Sign(Point p) => new Point(Math.Sign(p.X), Math.Sign(p.Y));
 
         /// <summary>
+        /// Return the magnitude of Point p.
+        /// </summary>
+        /// <param name="p"><see cref="Point"/> of which to get the sign</param>
+        /// <returns><see cref="Point"/> where X, Y have values corresponding to their sign</returns>
+        public static double Magnitude(Point p) => Math.Sqrt(p.X * p.X + p.Y * p.Y);
+
+        /// <summary>
         /// "Direction" vector from P1 to P2. X/Y of returned point will have values
         /// of -1, 0, or 1 only (vector is not normalized to length 1).
         /// </summary>
@@ -85,6 +92,22 @@ namespace MouseUnSnag
         /// <param name="p"><see cref="Point"/></param>
         /// <returns><see cref="Point"/></returns>
         public static Point OutsideDirection(Rectangle r, Point p) => Sign(OutsideDistance(r, p));
+
+        /// <summary>
+        /// In which direction(s) is(are) the rectangle r2 outside of the rectangle r1? If r2
+        /// overlaps r1, then this returns (0,0). Else X and/or Y can be either -1 or +1, depending
+        /// on which direction r2 is outside r1. For a rectangle to be diagonal to another rectangle,
+        /// it must not overlap horizontal or vertically.
+        /// </summary>
+        /// <param name="r"><see cref="Rectangle"/></param>
+        /// <param name="p"><see cref="Point"/></param>
+        /// <returns><see cref="Point"/></returns>
+        public static Point OutsideDirection(Rectangle r1, Rectangle r2) => (OverlapX(r1, r2), OverlapY(r1, r2)) switch {
+            (false, false) => new Point(Math.Sign(r2.Left - r1.Left), Math.Sign(r2.Top - r1.Top)),
+            (false, true) => new Point(Math.Sign(r2.Left - r1.Left), 0),
+            (true, false) => new Point(0, Math.Sign(r2.Top - r1.Top)),
+            (true, true) => new Point(0, 0),
+        };
 
 
         /// <summary>
