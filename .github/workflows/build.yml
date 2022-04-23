@@ -28,6 +28,7 @@ jobs:
         Configuration: ${{ matrix.configuration }}
     - name: Upload Executable Artifact
       uses: actions/upload-artifact@v3
+      if: ${{ matrix.configuration == 'Release' }}
       with:
         name: MouseUnSnag
         path: MouseUnSnag/bin/Release/MouseUnSnag.exe
