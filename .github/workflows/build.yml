@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         configuration: [Debug, Release]
-    runs-on: windows-latest
+    runs-on: windows-2022
     env:
       SolutionName: MouseUnSnag.sln
       TestProjectPath: MouseUnSnagTests\MouseUnSnagTests.csproj
@@ -22,7 +22,7 @@ jobs:
       shell: cmd
       run: |
         echo ::stop-commands::build-${{ github.run_id }}-${{ github.run_attempt }}
-        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+        call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
         msbuild %SolutionName% /restore /property:Configuration=%Configuration% /property:Platform="Any CPU"
       env:
         Configuration: ${{ matrix.configuration }}
