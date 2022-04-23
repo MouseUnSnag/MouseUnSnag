@@ -33,9 +33,19 @@ The program endeavors to fix two separate problems related to multiple monitors,
 
 3. **MouseUnSnag** also wraps the cursor around from the right edge of the rightmost monitor, to the left edge of the leftmost monitor, and vice versa. (I don't have a fancy graphic for that one!)
 
-## Command Line Options
+## Configuration
 
-The MouseUnSnag executable takes the following command line options in the format: `MouseUnSnag.exe [options ...]`. All options are enabled by default.
+MouseUnSnag can be configured in two ways: by using command line options or by selecting options in system tray icon's context menu. Options selected in the context menu are persisted to _%APPDATA%/MouseUnSnag/config.txt_. Options specified on the command line override option in the configuration file but are not persisted. The configuration file is only created if options are changed using the context menu, so MouseUnSnag is stateless if only command line options are used.
+
+The configuration file consists of a list of "name:value" statements, each on their own line (extra whitespace within a line is ignored). For example:
+
+```
+Wrap   :false
+Jump   :false
+Unstick:true
+```
+
+MouseUnSnag takes the following command line options in the format: `MouseUnSnag.exe [options ...]`. All options are enabled by default.
 
 * `-s`, `+s`
 
@@ -43,11 +53,11 @@ The MouseUnSnag executable takes the following command line options in the forma
 
 * `-j`, `+j`
 
-  Disable or enable respectively jumping the mose from an edge to the adjacent monitor.
+  Disable or enable respectively jumping the cursor from an edge to the adjacent monitor.
 
 * `-w`, `+w`
 
-  Disable or enable respectively wraping the cursor from one far edge to the other.
+  Disable or enable respectively wrapping the cursor from one far edge to the other.
 
 ## How does it do it?
 **MouseUnSnag** uses the low-level Win32 WH_MOUSE_LL callback to monitor the user's intended movement of the mouse. It also monitors the current position of the cursor on the screen. When **MouseUnSnag** detects that the mouse has tried to move beyond the edge/corner of the screen, but the cursor was not able to move, then it knows that the cursor is "stuck", and will attempt to sensibly move the cursor to an adjacent monitor, if one exists.
