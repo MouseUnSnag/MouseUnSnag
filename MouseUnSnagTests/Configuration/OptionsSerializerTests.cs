@@ -1,12 +1,12 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
 using MouseUnSnagTests.Configuration;
 
 namespace MouseUnSnag.Configuration.Tests
 {
-    [TestClass()]
+    [TestFixture]
     public class OptionsSerializerTests
     {
-        [TestMethod()]
+        [Test]
         public void SerializeDeserializeTest()
         {
             var serializer = new OptionsSerializer();

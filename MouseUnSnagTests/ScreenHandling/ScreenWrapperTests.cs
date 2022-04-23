@@ -1,12 +1,12 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
 using System.Windows.Forms;
 
 namespace MouseUnSnag.ScreenHandling.Tests
 {
-    [TestClass()]
+    [TestFixture]
     public class ScreenWrapperTests
     {
-        [TestMethod()]
+        [Test]
         public void ScreenWrapperTest()
         {
             var expected = Screen.PrimaryScreen;
@@ -14,7 +14,7 @@ namespace MouseUnSnag.ScreenHandling.Tests
             Compare(expected, actual);
         }
 
-        [TestMethod()]
+        [Test]
         public void ScreenWrapperConvertTest()
         {
             var expected = Screen.PrimaryScreen;
@@ -26,7 +26,7 @@ namespace MouseUnSnag.ScreenHandling.Tests
         }
 
 
-        [TestMethod()]
+        [Test]
         public void ToScreenTest()
         {
             var originalScreen = Screen.PrimaryScreen;
@@ -35,7 +35,7 @@ namespace MouseUnSnag.ScreenHandling.Tests
             Assert.AreSame(originalScreen, newScreen);
         }
 
-        [TestMethod()]
+        [Test]
         public void ToScreenWrapperTest()
         {
             var expected = Screen.PrimaryScreen;

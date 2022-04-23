@@ -1,0 +1,35 @@
+name: Build
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  build:
+    strategy:
+      matrix:
+        configuration: [Debug, Release]
+    runs-on: windows-2022
+    env:
+      SolutionName: MouseUnSnag.sln
+      TestProjectPath: MouseUnSnagTests\MouseUnSnagTests.csproj
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Build Solution
+      shell: cmd
+      run: |
+        echo ::stop-commands::build-${{ github.run_id }}-${{ github.run_attempt }}
+        call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+        msbuild %SolutionName% /restore /property:Configuration=%Configuration% /property:Platform="Any CPU"
+      env:
+        Configuration: ${{ matrix.configuration }}
+    - name: Test Solution
+      shell: cmd
+      run: |
+        echo ::stop-commands::test-${{ github.run_id }}-${{ github.run_attempt }}
+        %USERPROFILE%\.nuget\packages\nunit.consolerunner\3.15.0\tools\nunit3-console.exe --config=%Configuration% %TestProjectPath%
+      env:
+        Configuration: ${{ matrix.configuration }}
