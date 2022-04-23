@@ -47,7 +47,7 @@ namespace MouseUnSnag.ScreenHandling.Tests
             Console.WriteLine(screenInfo);
         }
 
-        [TestMethod()]
+        [Test]
         public void JumpScreenTest()
         {
             // Test arragements from issue #16
