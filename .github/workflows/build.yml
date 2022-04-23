@@ -26,6 +26,11 @@ jobs:
         msbuild %SolutionName% /restore /property:Configuration=%Configuration% /property:Platform="Any CPU"
       env:
         Configuration: ${{ matrix.configuration }}
+    - name: Upload Executable Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: MouseUnSnag
+        path: MouseUnSnag/bin/Release/MouseUnSnag.exe
     - name: Test Solution
       shell: cmd
       run: |
