@@ -19,7 +19,6 @@ namespace MouseUnSnagTests.Configuration
             Assert.AreEqual(expected.Jump, actual.Jump);
             Assert.AreEqual(expected.Wrap, actual.Wrap);
             Assert.AreEqual(expected.Unstick, actual.Unstick);
-            Assert.AreEqual(expected.Rescale, actual.Rescale);
         }
 
         public static IEnumerable<Options> OptionPermutations()
@@ -30,7 +29,7 @@ namespace MouseUnSnagTests.Configuration
                 foreach (var rescale in boolList)
                     foreach (var unstick in boolList)
                         foreach (var wrap in boolList)
-                            yield return new Options() { Jump = jump, Rescale = rescale, Unstick = unstick, Wrap = wrap};
+                            yield return new Options() { Jump = jump, Unstick = unstick, Wrap = wrap};
 
         }
 

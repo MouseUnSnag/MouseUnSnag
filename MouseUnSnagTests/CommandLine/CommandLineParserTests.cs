@@ -17,7 +17,6 @@ namespace MouseUnSnag.CommandLine.Tests
                 var opts = new List<string>();
                 opts.Add(options.Wrap ? "+w" : "-w");
                 opts.Add(options.Jump ? "+j" : "-j");
-                opts.Add(options.Rescale ? "+r" : "-r");
                 opts.Add(options.Unstick ? "+s" : "-s");
 
                 OptionsHelpers.Compare(options, parser.Decode(opts));
@@ -39,9 +38,6 @@ namespace MouseUnSnag.CommandLine.Tests
 
                     if (options.Jump != backingOptions.Jump)
                         opts.Add(options.Jump ? "+j" : "-j");
-
-                    if (options.Rescale != backingOptions.Rescale)
-                        opts.Add(options.Rescale ? "+r" : "-r");
 
                     if (options.Unstick != backingOptions.Unstick)
                         opts.Add(options.Unstick ? "+s" : "-s");

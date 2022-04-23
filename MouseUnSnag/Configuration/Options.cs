@@ -7,7 +7,6 @@ namespace MouseUnSnag.Configuration
         private bool _unstick = true;
         private bool _jump = true;
         private bool _wrap = true;
-        private bool _rescale;
 
         public bool Unstick
         {
@@ -42,19 +41,6 @@ namespace MouseUnSnag.Configuration
                     return;
                 
                 _wrap = value;
-                OnConfigChanged();
-            }
-        }
-
-        public bool Rescale
-        {
-            get => _rescale;
-            set
-            {
-                if (_rescale == value)
-                    return;
-                
-                _rescale = value;
                 OnConfigChanged();
             }
         }
