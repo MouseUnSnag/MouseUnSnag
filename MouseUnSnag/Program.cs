@@ -35,7 +35,7 @@ namespace MouseUnSnag
                 Win32Display.SetDpiAwareness(ProcessDpiAwareness.ProcessPerMonitorDpiAware);
 
                 // Load Config from File
-                var optionsFilename = Path.Combine(GetOptionsDirectory(), "snagConfig", "snagConfig.txt");
+                var optionsFilename = Path.Combine(GetOptionsDirectory(), "config.txt");
                 var writer = new OptionsWriter(optionsFilename);
                 var options = writer.TryRead();
 
@@ -62,20 +62,17 @@ namespace MouseUnSnag
         {
             try
             {
-                var assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                if (!string.IsNullOrEmpty(assemblyDir) && Directory.Exists(assemblyDir))
-                    return assemblyDir;
+                var optionsDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                if (!string.IsNullOrEmpty(optionsDir))
+                    return Path.Combine(optionsDir, "MouseUnSnag");
             }
             catch (ArgumentException e)
             {
                 Debug.WriteLine(e);
             }
 
-            var cliDirName = Environment.GetCommandLineArgs().First();
-            if (!string.IsNullOrEmpty(cliDirName) && Directory.Exists(cliDirName))
-                return cliDirName;
-
-            return Environment.CurrentDirectory;
+            Debug.WriteLine("Couldn't find AppData, falling back to current directory for config file");
+            return Path.Combine(Environment.CurrentDirectory, "MouseUnSnag");
         }
 
         private static int ShowAlreadyRunningMessageAndQuit()

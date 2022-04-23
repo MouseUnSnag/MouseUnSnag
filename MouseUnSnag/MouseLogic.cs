@@ -124,7 +124,7 @@ namespace MouseUnSnag
                 if (!Options.Unstick)
                     return false;
 
-                newCursor = Options.Rescale ? RescaleY(mouse, cursorScreen.Bounds, mouseScreen.Bounds) : mouse;
+                newCursor = mouse;
             }
             else if (jumpScreen != null)
             {
@@ -137,7 +137,7 @@ namespace MouseUnSnag
                 if (!Options.Jump)
                     return false;
 
-                newCursor = jumpScreen.Bounds.ClosestBoundaryPoint(Options.Rescale ? RescaleY(cursor, cursorScreen.Bounds, jumpScreen.Bounds) : cursor);
+                newCursor = jumpScreen.Bounds.ClosestBoundaryPoint(cursor);
             }
             else if (stuckDirection.X != 0)
             {
@@ -155,12 +155,6 @@ namespace MouseUnSnag
                     return false;
                 }
 
-                if (Options.Rescale)
-                {
-                    // Currently does not work properly. Wrapping from small screen bottom half to big screen appears to set the newCursor Position correctly, but the actual cursor does not move there.
-                    //wrapPoint = RescaleY(wrapPoint, cursorScreen.Bounds, wrapScreen.Bounds);
-                }
-
                 newCursor = wrapScreen.Bounds.ClosestBoundaryPoint(wrapPoint);
             }
             else
@@ -174,15 +168,6 @@ namespace MouseUnSnag
             return true;
         }
 
-        
-
-        private static Point RescaleY(Point p, Rectangle source, Rectangle destination)
-        {
-            if (Math.Abs(source.Top - destination.Top) > 20)
-                return p;
-
-            return p.RescaleY(source, destination);
-        }
 
         public event EventHandler<BoundsChangedEventArgs> LastCursorBoundsChanged;
         protected virtual void OnLastCursorBoundsChanged(BoundsChangedEventArgs e)

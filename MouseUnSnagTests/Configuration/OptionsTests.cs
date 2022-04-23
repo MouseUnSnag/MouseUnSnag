@@ -16,14 +16,11 @@ namespace MouseUnSnag.Configuration.Tests
             options.Jump = !options.Jump;
             Assert.AreEqual(1, events);
 
-            options.Rescale = !options.Rescale;
+            options.Unstick = !options.Unstick;
             Assert.AreEqual(2, events);
 
-            options.Unstick = !options.Unstick;
-            Assert.AreEqual(3, events);
-
             options.Wrap = !options.Wrap;
-            Assert.AreEqual(4, events);
+            Assert.AreEqual(3, events);
 
         }
     }

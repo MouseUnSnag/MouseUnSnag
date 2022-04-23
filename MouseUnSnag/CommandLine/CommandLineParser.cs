@@ -35,9 +35,6 @@ namespace MouseUnSnag.CommandLine
                     case 'W':
                         options.Wrap = flagValue;
                         break;
-                    case 'R':
-                        options.Rescale = flagValue;
-                        break;
                     default:
                         DisplayUsageAndExit($"Invalid Argument: {arg}");
                         break;

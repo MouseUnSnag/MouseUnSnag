@@ -33,7 +33,6 @@ namespace MouseUnSnag.Configuration
                 throw new ArgumentNullException(nameof(options));
 
             var opts = new List<(string name, object value)>();
-            opts.Add(("Rescale", options.Rescale));
             opts.Add(("Wrap   ", options.Wrap));
             opts.Add(("Jump   ", options.Jump));
             opts.Add(("Unstick", options.Unstick));
@@ -66,9 +65,6 @@ namespace MouseUnSnag.Configuration
                 {
                     switch (optionName.ToUpperInvariant())
                     {
-                        case "RESCALE":
-                            options.Rescale = bool.Parse(optionValue);
-                            break;
                         case "WRAP":
                             options.Wrap = bool.Parse(optionValue);
                             break;
